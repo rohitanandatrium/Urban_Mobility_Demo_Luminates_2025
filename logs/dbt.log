@@ -1,0 +1,288 @@
+[0m14:05:04.131109 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D724CBEC50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D726C36D10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D726C36E60>]}
+
+
+============================== 14:05:04.135123 | 39b068d4-674a-4e7d-9b57-f26aa56afb3d ==============================
+[0m14:05:04.135123 [info ] [MainThread]: Running with dbt=1.9.2
+[0m14:05:04.137129 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': '.github/workflows/utils', 'fail_fast': 'False', 'version_check': 'True', 'log_path': 'C:\\Users\\Rohit\\Desktop\\Urban_Mobility\\Urban_Mobility_Demo_Luminates_2025\\logs', 'debug': 'False', 'warn_error': 'None', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'introspect': 'True', 'invocation_command': 'dbt debug --profiles-dir .github/workflows/utils', 'static_parser': 'True', 'target_path': 'None', 'log_format': 'default', 'send_anonymous_usage_stats': 'True'}
+[0m14:05:04.150845 [info ] [MainThread]: dbt version: 1.9.2
+[0m14:05:04.162606 [info ] [MainThread]: python version: 3.10.16
+[0m14:05:04.163534 [info ] [MainThread]: python path: C:\Users\Rohit\.rye\py\cpython@3.10.16\python.exe
+[0m14:05:04.163534 [info ] [MainThread]: os info: Windows-10-10.0.26100-SP0
+[0m14:05:04.163534 [error] [MainThread]: Encountered an error:
+Parsing Error
+  Env var required but not provided: 'SNOWFLAKE_ACCOUNT'
+[0m14:05:04.163534 [debug] [MainThread]: Command `dbt debug` failed at 14:05:04.163534 after 0.11 seconds
+[0m14:05:04.163534 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D724CBEC50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D726C3A860>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D726C39030>]}
+[0m14:05:04.163534 [debug] [MainThread]: Flushing usage events
+[0m14:05:05.517355 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:14:47.800713 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC6B6EC50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC8AE6CB0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC8AE6E90>]}
+
+
+============================== 15:14:47.800713 | 82842960-9fa3-496f-850a-286084b641cc ==============================
+[0m15:14:47.800713 [info ] [MainThread]: Running with dbt=1.9.2
+[0m15:14:47.800713 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'version_check': 'True', 'fail_fast': 'False', 'log_path': 'C:\\Users\\Rohit\\Desktop\\Urban_Mobility\\Urban_Mobility_Demo_Luminates_2025\\logs', 'profiles_dir': 'C:\\Users\\Rohit\\.dbt', 'debug': 'False', 'use_colors': 'True', 'use_experimental_parser': 'False', 'empty': 'None', 'quiet': 'False', 'no_print': 'None', 'log_format': 'default', 'invocation_command': 'dbt debug', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'introspect': 'True', 'target_path': 'None', 'static_parser': 'True', 'send_anonymous_usage_stats': 'True'}
+[0m15:14:47.821625 [info ] [MainThread]: dbt version: 1.9.2
+[0m15:14:47.821625 [info ] [MainThread]: python version: 3.10.16
+[0m15:14:47.821625 [info ] [MainThread]: python path: C:\Users\Rohit\.rye\py\cpython@3.10.16\python.exe
+[0m15:14:47.821625 [info ] [MainThread]: os info: Windows-10-10.0.26100-SP0
+[0m15:14:47.835017 [info ] [MainThread]: Error importing adapter: No module named 'dbt.adapters.snowflake'
+[0m15:14:47.835017 [info ] [MainThread]: Using profiles dir at C:\Users\Rohit\.dbt
+[0m15:14:47.835017 [info ] [MainThread]: Using profiles.yml file at C:\Users\Rohit\.dbt\profiles.yml
+[0m15:14:47.835017 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Rohit\Desktop\Urban_Mobility\Urban_Mobility_Demo_Luminates_2025\dbt_project.yml
+[0m15:14:47.835017 [error] [MainThread]: Encountered an error:
+Compilation Error
+  Could not render {{ target.schema }}: 'target' is undefined
+[0m15:14:47.835017 [debug] [MainThread]: Command `dbt debug` failed at 15:14:47.835017 after 0.11 seconds
+[0m15:14:47.835017 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC6B6EC50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC8AEA5C0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001FEC8AE8100>]}
+[0m15:14:47.835017 [debug] [MainThread]: Flushing usage events
+[0m15:14:49.342969 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:27:02.570832 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002257F52EC50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000225014A6CB0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000225014A6E90>]}
+
+
+============================== 15:27:02.570832 | c5f4d13f-e7e3-4b6a-bcab-ee831c4b8bf0 ==============================
+[0m15:27:02.570832 [info ] [MainThread]: Running with dbt=1.9.2
+[0m15:27:02.570832 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'log_cache_events': 'False', 'write_json': 'True', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'fail_fast': 'False', 'debug': 'False', 'log_path': 'C:\\Users\\Rohit\\Desktop\\Urban_Mobility\\Urban_Mobility_Demo_Luminates_2025\\logs', 'profiles_dir': 'C:\\Users\\Rohit\\.dbt', 'version_check': 'True', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'log_format': 'default', 'static_parser': 'True', 'invocation_command': 'dbt debug', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'target_path': 'None', 'introspect': 'True', 'send_anonymous_usage_stats': 'True'}
+[0m15:27:02.589327 [info ] [MainThread]: dbt version: 1.9.2
+[0m15:27:02.589327 [info ] [MainThread]: python version: 3.10.16
+[0m15:27:02.589327 [info ] [MainThread]: python path: C:\Users\Rohit\.rye\py\cpython@3.10.16\python.exe
+[0m15:27:02.600309 [info ] [MainThread]: os info: Windows-10-10.0.26100-SP0
+[0m15:27:02.604149 [info ] [MainThread]: Error importing adapter: No module named 'dbt.adapters.snowflake'
+[0m15:27:02.604149 [info ] [MainThread]: Using profiles dir at C:\Users\Rohit\.dbt
+[0m15:27:02.604149 [info ] [MainThread]: Using profiles.yml file at C:\Users\Rohit\.dbt\profiles.yml
+[0m15:27:02.604149 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Rohit\Desktop\Urban_Mobility\Urban_Mobility_Demo_Luminates_2025\dbt_project.yml
+[0m15:27:02.604149 [error] [MainThread]: Encountered an error:
+Compilation Error
+  Could not render {{ target.schema }}: 'target' is undefined
+[0m15:27:02.604149 [debug] [MainThread]: Command `dbt debug` failed at 15:27:02.604149 after 0.13 seconds
+[0m15:27:02.604149 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002257F52EC50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000225014A8940>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000225014AB730>]}
+[0m15:27:02.604149 [debug] [MainThread]: Flushing usage events
+[0m15:27:04.195022 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:28:39.958031 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000178E732AC80>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000178E92A6C50>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000178E92A6E30>]}
+
+
+============================== 15:28:39.964296 | d4a7873e-e3b0-4837-b66f-2f59c91aefa3 ==============================
+[0m15:28:39.964296 [info ] [MainThread]: Running with dbt=1.9.2
+[0m15:28:39.964296 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'write_json': 'True', 'log_cache_events': 'False', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': 'C:\\Users\\Rohit\\.dbt', 'fail_fast': 'False', 'version_check': 'True', 'log_path': 'C:\\Users\\Rohit\\Desktop\\Urban_Mobility\\Urban_Mobility_Demo_Luminates_2025\\logs', 'debug': 'False', 'warn_error': 'None', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'static_parser': 'True', 'invocation_command': 'dbt debug', 'log_format': 'default', 'target_path': 'None', 'introspect': 'True', 'send_anonymous_usage_stats': 'True'}
+[0m15:28:39.981366 [info ] [MainThread]: dbt version: 1.9.2
+[0m15:28:39.982377 [info ] [MainThread]: python version: 3.10.16
+[0m15:28:39.982377 [info ] [MainThread]: python path: C:\Users\Rohit\.rye\py\cpython@3.10.16\python.exe
+[0m15:28:39.982377 [info ] [MainThread]: os info: Windows-10-10.0.26100-SP0
+[0m15:28:39.987610 [info ] [MainThread]: Error importing adapter: No module named 'dbt.adapters.snowflake'
+[0m15:28:39.987610 [info ] [MainThread]: Using profiles dir at C:\Users\Rohit\.dbt
+[0m15:28:39.989073 [info ] [MainThread]: Using profiles.yml file at C:\Users\Rohit\.dbt\profiles.yml
+[0m15:28:39.989073 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Rohit\Desktop\Urban_Mobility\Urban_Mobility_Demo_Luminates_2025\dbt_project.yml
+[0m15:28:39.995348 [error] [MainThread]: Encountered an error:
+Compilation Error
+  Could not render {{ target.schema }}: 'target' is undefined
+[0m15:28:39.995348 [debug] [MainThread]: Command `dbt debug` failed at 15:28:39.995348 after 0.11 seconds
+[0m15:28:39.995348 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000178E732AC80>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000178E92AB6D0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000178E92A8DC0>]}
+[0m15:28:39.995348 [debug] [MainThread]: Flushing usage events
+[0m15:28:41.473565 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:37:05.838079 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018062BA57E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018064D55CF0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018064D55B10>]}
+
+
+============================== 15:37:05.838079 | 8133c408-4360-4484-9ef2-93207320316b ==============================
+[0m15:37:05.838079 [info ] [MainThread]: Running with dbt=1.11.0-b3
+[0m15:37:05.843502 [debug] [MainThread]: running dbt with arguments {'cache_selected_only': 'False', 'target_path': 'None', 'profiles_dir': 'C:\\Users\\Rohit\\.dbt', 'invocation_command': 'dbt debug', 'log_format': 'default', 'warn_error': 'None', 'static_parser': 'True', 'fail_fast': 'False', 'log_path': 'C:\\Users\\Rohit\\Desktop\\Urban_Mobility\\Urban_Mobility_Demo_Luminates_2025\\logs', 'send_anonymous_usage_stats': 'True', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'partial_parse': 'True', 'version_check': 'True', 'use_experimental_parser': 'False', 'introspect': 'True', 'quiet': 'False', 'empty': 'None', 'log_cache_events': 'False', 'debug': 'False', 'no_print': 'None', 'use_colors': 'True', 'printer_width': '80', 'write_json': 'True'}
+[0m15:37:05.844130 [info ] [MainThread]: dbt version: 1.11.0-b3
+[0m15:37:05.844130 [info ] [MainThread]: python version: 3.10.16
+[0m15:37:05.844130 [info ] [MainThread]: python path: C:\Users\Rohit\.rye\py\cpython@3.10.16\python.exe
+[0m15:37:05.858329 [info ] [MainThread]: os info: Windows-10-10.0.26100-SP0
+[0m15:37:06.137203 [info ] [MainThread]: Using profiles dir at C:\Users\Rohit\.dbt
+[0m15:37:06.137203 [info ] [MainThread]: Using profiles.yml file at C:\Users\Rohit\.dbt\profiles.yml
+[0m15:37:06.137203 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Rohit\Desktop\Urban_Mobility\Urban_Mobility_Demo_Luminates_2025\dbt_project.yml
+[0m15:37:06.137203 [info ] [MainThread]: adapter type: snowflake
+[0m15:37:06.137203 [info ] [MainThread]: adapter version: 1.10.2
+[0m15:37:06.229525 [info ] [MainThread]: Configuration:
+[0m15:37:06.229525 [info ] [MainThread]:   profiles.yml file [[32mOK found and valid[0m]
+[0m15:37:06.229525 [info ] [MainThread]:   dbt_project.yml file [[32mOK found and valid[0m]
+[0m15:37:06.229525 [info ] [MainThread]: Required dependencies:
+[0m15:37:06.229525 [debug] [MainThread]: Executing "git --help"
+[0m15:37:06.266875 [debug] [MainThread]: STDOUT: "b"usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]\n           [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]\n           [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]\n           <command> [<args>]\n\nThese are common Git commands used in various situations:\n\nstart a working area (see also: git help tutorial)\n   clone      Clone a repository into a new directory\n   init       Create an empty Git repository or reinitialize an existing one\n\nwork on the current change (see also: git help everyday)\n   add        Add file contents to the index\n   mv         Move or rename a file, a directory, or a symlink\n   restore    Restore working tree files\n   rm         Remove files from the working tree and from the index\n\nexamine the history and state (see also: git help revisions)\n   bisect     Use binary search to find the commit that introduced a bug\n   diff       Show changes between commits, commit and working tree, etc\n   grep       Print lines matching a pattern\n   log        Show commit logs\n   show       Show various types of objects\n   status     Show the working tree status\n\ngrow, mark and tweak your common history\n   backfill   Download missing objects in a partial clone\n   branch     List, create, or delete branches\n   commit     Record changes to the repository\n   merge      Join two or more development histories together\n   rebase     Reapply commits on top of another base tip\n   reset      Reset current HEAD to the specified state\n   switch     Switch branches\n   tag        Create, list, delete or verify a tag object signed with GPG\n\ncollaborate (see also: git help workflows)\n   fetch      Download objects and refs from another repository\n   pull       Fetch from and integrate with another repository or a local branch\n   push       Update remote refs along with associated objects\n\n'git help -a' and 'git help -g' list available subcommands and some\nconcept guides. See 'git help <command>' or 'git help <concept>'\nto read about a specific subcommand or concept.\nSee 'git help git' for an overview of the system.\n""
+[0m15:37:06.266875 [debug] [MainThread]: STDERR: "b''"
+[0m15:37:06.266875 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m15:37:06.266875 [info ] [MainThread]: Connection:
+[0m15:37:06.266875 [info ] [MainThread]:   account: ZPCPFEQ-EU58818
+[0m15:37:06.266875 [info ] [MainThread]:   user: ATRIUMJPRDE
+[0m15:37:06.266875 [info ] [MainThread]:   database: URBAN_MOBILITY_DEV
+[0m15:37:06.266875 [info ] [MainThread]:   warehouse: URBAN_MOBILITY_DEV
+[0m15:37:06.266875 [info ] [MainThread]:   role: ACCOUNTADMIN
+[0m15:37:06.266875 [info ] [MainThread]:   schema: ROHIT
+[0m15:37:06.266875 [info ] [MainThread]:   authenticator: externalbrowser
+[0m15:37:06.266875 [info ] [MainThread]:   oauth_client_id: None
+[0m15:37:06.266875 [info ] [MainThread]:   query_tag: None
+[0m15:37:06.266875 [info ] [MainThread]:   client_session_keep_alive: False
+[0m15:37:06.266875 [info ] [MainThread]:   host: None
+[0m15:37:06.266875 [info ] [MainThread]:   port: None
+[0m15:37:06.266875 [info ] [MainThread]:   proxy_host: None
+[0m15:37:06.266875 [info ] [MainThread]:   proxy_port: None
+[0m15:37:06.266875 [info ] [MainThread]:   protocol: None
+[0m15:37:06.266875 [info ] [MainThread]:   connect_retries: 1
+[0m15:37:06.278548 [info ] [MainThread]:   connect_timeout: None
+[0m15:37:06.278548 [info ] [MainThread]:   retry_on_database_errors: False
+[0m15:37:06.279589 [info ] [MainThread]:   retry_all: False
+[0m15:37:06.279589 [info ] [MainThread]:   insecure_mode: False
+[0m15:37:06.280641 [info ] [MainThread]:   reuse_connections: True
+[0m15:37:06.281644 [info ] [MainThread]:   s3_stage_vpce_dns_name: None
+[0m15:37:06.281644 [info ] [MainThread]: Registered adapter: snowflake=1.10.2
+[0m15:37:06.545033 [debug] [MainThread]: Acquiring new snowflake connection 'debug'
+[0m15:37:09.347837 [debug] [MainThread]: Using snowflake connection "debug"
+[0m15:37:09.347837 [debug] [MainThread]: On debug: select 1 as id
+[0m15:37:09.347837 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m15:37:12.807679 [debug] [MainThread]: Snowflake adapter: Error running SQL: select 1 as id
+[0m15:37:12.807679 [debug] [MainThread]: Snowflake adapter: Rolling back transaction.
+[0m15:37:12.807679 [info ] [MainThread]:   Connection test: [[31mERROR[0m]
+
+[0m15:37:12.807679 [info ] [MainThread]: [31m1 check failed:[0m
+[0m15:37:12.807679 [info ] [MainThread]: dbt was unable to connect to the specified database.
+The database returned the following error:
+
+  >Database Error
+  390190 (08001): Failed to connect to DB: ZPCPFEQ-EU58818.snowflakecomputing.com:443, There was an error related to the SAML Identity Provider account parameter. Contact Snowflake support.
+
+Check your database credentials and try again. For more information, visit:
+https://docs.getdbt.com/docs/configure-your-profile
+
+
+[0m15:37:12.820579 [debug] [MainThread]: Command `dbt debug` failed at 15:37:12.820579 after 7.05 seconds
+[0m15:37:12.820579 [debug] [MainThread]: Connection 'debug' was left open.
+[0m15:37:12.820579 [debug] [MainThread]: On debug: No close available on handle
+[0m15:37:12.820579 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018062BA57E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018063C62C20>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018062C47670>]}
+[0m15:37:12.820579 [debug] [MainThread]: Flushing usage events
+[0m15:37:14.246377 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:37:57.364706 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024F5F4458A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024F613F1B70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024F613F3DC0>]}
+
+
+============================== 15:37:57.367635 | a5bc0c66-925c-4357-a5c5-fd8fee0e9206 ==============================
+[0m15:37:57.367635 [info ] [MainThread]: Running with dbt=1.11.0-b3
+[0m15:37:57.367635 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'no_print': 'None', 'profiles_dir': 'C:\\Users\\Rohit\\.dbt', 'write_json': 'True', 'invocation_command': 'dbt debug', 'warn_error': 'None', 'indirect_selection': 'eager', 'partial_parse': 'True', 'log_path': 'C:\\Users\\Rohit\\Desktop\\Urban_Mobility\\Urban_Mobility_Demo_Luminates_2025\\logs', 'send_anonymous_usage_stats': 'True', 'static_parser': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'fail_fast': 'False', 'use_experimental_parser': 'False', 'version_check': 'True', 'quiet': 'False', 'introspect': 'True', 'empty': 'None', 'log_cache_events': 'False', 'debug': 'False', 'log_format': 'default', 'use_colors': 'True', 'cache_selected_only': 'False', 'target_path': 'None'}
+[0m15:37:57.383684 [info ] [MainThread]: dbt version: 1.11.0-b3
+[0m15:37:57.383684 [info ] [MainThread]: python version: 3.10.16
+[0m15:37:57.383684 [info ] [MainThread]: python path: C:\Users\Rohit\.rye\py\cpython@3.10.16\python.exe
+[0m15:37:57.383684 [info ] [MainThread]: os info: Windows-10-10.0.26100-SP0
+[0m15:37:57.781600 [info ] [MainThread]: Using profiles dir at C:\Users\Rohit\.dbt
+[0m15:37:57.783104 [info ] [MainThread]: Using profiles.yml file at C:\Users\Rohit\.dbt\profiles.yml
+[0m15:37:57.783104 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Rohit\Desktop\Urban_Mobility\Urban_Mobility_Demo_Luminates_2025\dbt_project.yml
+[0m15:37:57.783104 [info ] [MainThread]: adapter type: snowflake
+[0m15:37:57.783104 [info ] [MainThread]: adapter version: 1.10.2
+[0m15:37:57.877823 [info ] [MainThread]: Configuration:
+[0m15:37:57.878831 [info ] [MainThread]:   profiles.yml file [[32mOK found and valid[0m]
+[0m15:37:57.879833 [info ] [MainThread]:   dbt_project.yml file [[32mOK found and valid[0m]
+[0m15:37:57.879833 [info ] [MainThread]: Required dependencies:
+[0m15:37:57.881101 [debug] [MainThread]: Executing "git --help"
+[0m15:37:57.907833 [debug] [MainThread]: STDOUT: "b"usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]\n           [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]\n           [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]\n           <command> [<args>]\n\nThese are common Git commands used in various situations:\n\nstart a working area (see also: git help tutorial)\n   clone      Clone a repository into a new directory\n   init       Create an empty Git repository or reinitialize an existing one\n\nwork on the current change (see also: git help everyday)\n   add        Add file contents to the index\n   mv         Move or rename a file, a directory, or a symlink\n   restore    Restore working tree files\n   rm         Remove files from the working tree and from the index\n\nexamine the history and state (see also: git help revisions)\n   bisect     Use binary search to find the commit that introduced a bug\n   diff       Show changes between commits, commit and working tree, etc\n   grep       Print lines matching a pattern\n   log        Show commit logs\n   show       Show various types of objects\n   status     Show the working tree status\n\ngrow, mark and tweak your common history\n   backfill   Download missing objects in a partial clone\n   branch     List, create, or delete branches\n   commit     Record changes to the repository\n   merge      Join two or more development histories together\n   rebase     Reapply commits on top of another base tip\n   reset      Reset current HEAD to the specified state\n   switch     Switch branches\n   tag        Create, list, delete or verify a tag object signed with GPG\n\ncollaborate (see also: git help workflows)\n   fetch      Download objects and refs from another repository\n   pull       Fetch from and integrate with another repository or a local branch\n   push       Update remote refs along with associated objects\n\n'git help -a' and 'git help -g' list available subcommands and some\nconcept guides. See 'git help <command>' or 'git help <concept>'\nto read about a specific subcommand or concept.\nSee 'git help git' for an overview of the system.\n""
+[0m15:37:57.907833 [debug] [MainThread]: STDERR: "b''"
+[0m15:37:57.907833 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m15:37:57.907833 [info ] [MainThread]: Connection:
+[0m15:37:57.907833 [info ] [MainThread]:   account: ZPCPFEQ-EU58818
+[0m15:37:57.907833 [info ] [MainThread]:   user: ATRIUMJPRDE
+[0m15:37:57.907833 [info ] [MainThread]:   database: URBAN_MOBILITY_DEV
+[0m15:37:57.907833 [info ] [MainThread]:   warehouse: URBAN_MOBILITY_WH
+[0m15:37:57.907833 [info ] [MainThread]:   role: ACCOUNTADMIN
+[0m15:37:57.907833 [info ] [MainThread]:   schema: ROHIT
+[0m15:37:57.916342 [info ] [MainThread]:   authenticator: externalbrowser
+[0m15:37:57.917444 [info ] [MainThread]:   oauth_client_id: None
+[0m15:37:57.918000 [info ] [MainThread]:   query_tag: None
+[0m15:37:57.918000 [info ] [MainThread]:   client_session_keep_alive: False
+[0m15:37:57.918000 [info ] [MainThread]:   host: None
+[0m15:37:57.918000 [info ] [MainThread]:   port: None
+[0m15:37:57.918000 [info ] [MainThread]:   proxy_host: None
+[0m15:37:57.918000 [info ] [MainThread]:   proxy_port: None
+[0m15:37:57.918000 [info ] [MainThread]:   protocol: None
+[0m15:37:57.918000 [info ] [MainThread]:   connect_retries: 1
+[0m15:37:57.918000 [info ] [MainThread]:   connect_timeout: None
+[0m15:37:57.918000 [info ] [MainThread]:   retry_on_database_errors: False
+[0m15:37:57.918000 [info ] [MainThread]:   retry_all: False
+[0m15:37:57.918000 [info ] [MainThread]:   insecure_mode: False
+[0m15:37:57.918000 [info ] [MainThread]:   reuse_connections: True
+[0m15:37:57.918000 [info ] [MainThread]:   s3_stage_vpce_dns_name: None
+[0m15:37:57.918000 [info ] [MainThread]: Registered adapter: snowflake=1.10.2
+[0m15:37:58.149571 [debug] [MainThread]: Acquiring new snowflake connection 'debug'
+[0m15:37:58.182776 [debug] [MainThread]: Using snowflake connection "debug"
+[0m15:37:58.182776 [debug] [MainThread]: On debug: select 1 as id
+[0m15:37:58.198426 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m15:38:00.839019 [debug] [MainThread]: Snowflake adapter: Error running SQL: select 1 as id
+[0m15:38:00.839019 [debug] [MainThread]: Snowflake adapter: Rolling back transaction.
+[0m15:38:00.839019 [info ] [MainThread]:   Connection test: [[31mERROR[0m]
+
+[0m15:38:00.839019 [info ] [MainThread]: [31m1 check failed:[0m
+[0m15:38:00.839019 [info ] [MainThread]: dbt was unable to connect to the specified database.
+The database returned the following error:
+
+  >Database Error
+  390190 (08001): Failed to connect to DB: ZPCPFEQ-EU58818.snowflakecomputing.com:443, There was an error related to the SAML Identity Provider account parameter. Contact Snowflake support.
+
+Check your database credentials and try again. For more information, visit:
+https://docs.getdbt.com/docs/configure-your-profile
+
+
+[0m15:38:00.849178 [debug] [MainThread]: Command `dbt debug` failed at 15:38:00.849178 after 3.56 seconds
+[0m15:38:00.849678 [debug] [MainThread]: Connection 'debug' was left open.
+[0m15:38:00.849678 [debug] [MainThread]: On debug: No close available on handle
+[0m15:38:00.849678 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024F5F4458A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024F6059FBB0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000024F60503760>]}
+[0m15:38:00.849678 [debug] [MainThread]: Flushing usage events
+[0m15:38:01.966833 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m15:39:11.671306 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001B4BE7C58A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001B4BF7B1B70>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001B4BF7B3DC0>]}
+
+
+============================== 15:39:11.671306 | ab72ec87-3ed9-4a95-b19a-10aaf3ad2576 ==============================
+[0m15:39:11.671306 [info ] [MainThread]: Running with dbt=1.11.0-b3
+[0m15:39:11.671306 [debug] [MainThread]: running dbt with arguments {'invocation_command': 'dbt debug', 'profiles_dir': 'C:\\Users\\Rohit\\.dbt', 'cache_selected_only': 'False', 'log_format': 'default', 'target_path': 'None', 'warn_error': 'None', 'log_path': 'C:\\Users\\Rohit\\Desktop\\Urban_Mobility\\Urban_Mobility_Demo_Luminates_2025\\logs', 'partial_parse': 'True', 'static_parser': 'True', 'send_anonymous_usage_stats': 'True', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'fail_fast': 'False', 'version_check': 'True', 'use_experimental_parser': 'False', 'introspect': 'True', 'quiet': 'False', 'empty': 'None', 'log_cache_events': 'False', 'debug': 'False', 'no_print': 'None', 'use_colors': 'True', 'printer_width': '80', 'write_json': 'True'}
+[0m15:39:11.687883 [info ] [MainThread]: dbt version: 1.11.0-b3
+[0m15:39:11.687883 [info ] [MainThread]: python version: 3.10.16
+[0m15:39:11.687883 [info ] [MainThread]: python path: C:\Users\Rohit\.rye\py\cpython@3.10.16\python.exe
+[0m15:39:11.699627 [info ] [MainThread]: os info: Windows-10-10.0.26100-SP0
+[0m15:39:12.004744 [info ] [MainThread]: Using profiles dir at C:\Users\Rohit\.dbt
+[0m15:39:12.004744 [info ] [MainThread]: Using profiles.yml file at C:\Users\Rohit\.dbt\profiles.yml
+[0m15:39:12.004744 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Rohit\Desktop\Urban_Mobility\Urban_Mobility_Demo_Luminates_2025\dbt_project.yml
+[0m15:39:12.004744 [info ] [MainThread]: adapter type: snowflake
+[0m15:39:12.004744 [info ] [MainThread]: adapter version: 1.10.2
+[0m15:39:12.093706 [info ] [MainThread]: Configuration:
+[0m15:39:12.094817 [info ] [MainThread]:   profiles.yml file [[32mOK found and valid[0m]
+[0m15:39:12.095879 [info ] [MainThread]:   dbt_project.yml file [[32mOK found and valid[0m]
+[0m15:39:12.095879 [info ] [MainThread]: Required dependencies:
+[0m15:39:12.097336 [debug] [MainThread]: Executing "git --help"
+[0m15:39:12.124948 [debug] [MainThread]: STDOUT: "b"usage: git [-v | --version] [-h | --help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--no-lazy-fetch]\n           [--no-optional-locks] [--no-advice] [--bare] [--git-dir=<path>]\n           [--work-tree=<path>] [--namespace=<name>] [--config-env=<name>=<envvar>]\n           <command> [<args>]\n\nThese are common Git commands used in various situations:\n\nstart a working area (see also: git help tutorial)\n   clone      Clone a repository into a new directory\n   init       Create an empty Git repository or reinitialize an existing one\n\nwork on the current change (see also: git help everyday)\n   add        Add file contents to the index\n   mv         Move or rename a file, a directory, or a symlink\n   restore    Restore working tree files\n   rm         Remove files from the working tree and from the index\n\nexamine the history and state (see also: git help revisions)\n   bisect     Use binary search to find the commit that introduced a bug\n   diff       Show changes between commits, commit and working tree, etc\n   grep       Print lines matching a pattern\n   log        Show commit logs\n   show       Show various types of objects\n   status     Show the working tree status\n\ngrow, mark and tweak your common history\n   backfill   Download missing objects in a partial clone\n   branch     List, create, or delete branches\n   commit     Record changes to the repository\n   merge      Join two or more development histories together\n   rebase     Reapply commits on top of another base tip\n   reset      Reset current HEAD to the specified state\n   switch     Switch branches\n   tag        Create, list, delete or verify a tag object signed with GPG\n\ncollaborate (see also: git help workflows)\n   fetch      Download objects and refs from another repository\n   pull       Fetch from and integrate with another repository or a local branch\n   push       Update remote refs along with associated objects\n\n'git help -a' and 'git help -g' list available subcommands and some\nconcept guides. See 'git help <command>' or 'git help <concept>'\nto read about a specific subcommand or concept.\nSee 'git help git' for an overview of the system.\n""
+[0m15:39:12.124948 [debug] [MainThread]: STDERR: "b''"
+[0m15:39:12.124948 [info ] [MainThread]:  - git [[32mOK found[0m]
+
+[0m15:39:12.124948 [info ] [MainThread]: Connection:
+[0m15:39:12.124948 [info ] [MainThread]:   account: ZPCPFEQ-EU58818
+[0m15:39:12.124948 [info ] [MainThread]:   user: ATRIUMJPRDE
+[0m15:39:12.124948 [info ] [MainThread]:   database: URBAN_MOBILITY_DEV
+[0m15:39:12.124948 [info ] [MainThread]:   warehouse: URBAN_MOBILITY_WH
+[0m15:39:12.131237 [info ] [MainThread]:   role: ACCOUNTADMIN
+[0m15:39:12.131237 [info ] [MainThread]:   schema: ROHIT
+[0m15:39:12.131237 [info ] [MainThread]:   authenticator: snowflake
+[0m15:39:12.131237 [info ] [MainThread]:   oauth_client_id: None
+[0m15:39:12.131237 [info ] [MainThread]:   query_tag: None
+[0m15:39:12.131237 [info ] [MainThread]:   client_session_keep_alive: False
+[0m15:39:12.131237 [info ] [MainThread]:   host: None
+[0m15:39:12.131237 [info ] [MainThread]:   port: None
+[0m15:39:12.131237 [info ] [MainThread]:   proxy_host: None
+[0m15:39:12.131237 [info ] [MainThread]:   proxy_port: None
+[0m15:39:12.131237 [info ] [MainThread]:   protocol: None
+[0m15:39:12.131237 [info ] [MainThread]:   connect_retries: 1
+[0m15:39:12.131237 [info ] [MainThread]:   connect_timeout: None
+[0m15:39:12.131237 [info ] [MainThread]:   retry_on_database_errors: False
+[0m15:39:12.131237 [info ] [MainThread]:   retry_all: False
+[0m15:39:12.137508 [info ] [MainThread]:   insecure_mode: False
+[0m15:39:12.138521 [info ] [MainThread]:   reuse_connections: True
+[0m15:39:12.138521 [info ] [MainThread]:   s3_stage_vpce_dns_name: None
+[0m15:39:12.139576 [info ] [MainThread]: Registered adapter: snowflake=1.10.2
+[0m15:39:12.287977 [debug] [MainThread]: Acquiring new snowflake connection 'debug'
+[0m15:39:12.321452 [debug] [MainThread]: Using snowflake connection "debug"
+[0m15:39:12.321452 [debug] [MainThread]: On debug: select 1 as id
+[0m15:39:12.321452 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m15:39:15.021839 [debug] [MainThread]: SQL status: SUCCESS 1 in 2.706 seconds
+[0m15:39:15.021839 [info ] [MainThread]:   Connection test: [[32mOK connection ok[0m]
+
+[0m15:39:15.021839 [info ] [MainThread]: [32mAll checks passed![0m
+[0m15:39:15.021839 [debug] [MainThread]: Command `dbt debug` succeeded at 15:39:15.021839 after 3.42 seconds
+[0m15:39:15.036204 [debug] [MainThread]: Connection 'debug' was left open.
+[0m15:39:15.036204 [debug] [MainThread]: On debug: Close
+[0m15:39:15.138268 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001B4BE7C58A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001B4BD41BA00>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001B4BFDD6CB0>]}
+[0m15:39:15.138268 [debug] [MainThread]: Flushing usage events
+[0m15:39:16.907676 [debug] [MainThread]: An error was encountered while trying to flush usage events
