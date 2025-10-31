@@ -1,13 +1,13 @@
 name: 'Urban_Mobility_Demo_Luminates_2025'
-config-version: 2
 version: '1.0.0'
+config-version: 2
 
 profile: 'urban_mobility_demo'
 
-source-paths: ["models"]
-analysis-paths: ["analyses"]
+model-paths: ["models"]
+seed-paths: ["seeds"]
 test-paths: ["tests"]
-data-paths: ["seeds"]
+analysis-paths: ["analyses"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
@@ -20,3 +20,4 @@ models:
   Urban_Mobility_Demo_Luminates_2025:
     +materialized: view
     +schema: "{{ target.schema }}"
+    +database: "{{ target.database }}"
