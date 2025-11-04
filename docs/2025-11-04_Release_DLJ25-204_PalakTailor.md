@@ -1,8 +1,6 @@
-Hi @Palak Tailor  
+hi @Rohit Anand
 
 Good Afternoon!
-
-
 
 \## Release 2025.11.04 - Stage model for Citi Bike trips (DLJ25-204)
 
