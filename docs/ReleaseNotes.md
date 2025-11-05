@@ -12,7 +12,7 @@ Prepared by Atrium.ai   _Palak.Tailor@atrium.ai_
 
 [**PR4**](https://github.com/rohitanandatrium/Urban_Mobility_Demo_Luminates_2025/pull/PR4)
 
-## 🚀 New Implementation
+##  New Implementation
 
 ### 1. [DLJ25-204 – Stage Model for Citi Bike Trips](https://atriumai.atlassian.net/browse/DLJ25-204)
 
