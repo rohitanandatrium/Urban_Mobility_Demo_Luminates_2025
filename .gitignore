@@ -1,17 +1,17 @@
+# Python virtual environment
 .venv/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-
+# dbt generated folders
 target/
 logs/
 dbt_packages/
 dbt_modules/
 
-
-
+# dbt generated artifacts
 manifest.json
 run_results.json
 partial_parse.msgpack
@@ -19,8 +19,19 @@ graph_summary.json
 graph.gpickle
 semantic_manifest.json
 
-
+# Local config
 profiles.yml
 .env
 *.env
 
+# System / editor files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+*.log
+
+# Cache or temporary files
+CACHE/
+.cache/
+tmp/
