@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: stg_citibike_trips
+    description: "Stage model that extracts structured Citibike trip data from the Bronze VARIANT table."
+    columns:
+      - name: tripduration
+        description: "Duration of each trip in seconds."
+        tests:
+          - not_null
+      - name: starttime
+        description: "Trip start timestamp."
+        tests:
+          - not_null
+      - name: stoptime
+        description: "Trip stop timestamp."
+      - name: start_station_id
+        description: "Unique ID of the start station."
+      - name: end_station_id
+        description: "Unique ID of the end station."
+      - name: bikeid
+        description: "Unique bike identifier."
+      - name: usertype
+        description: "User type (Subscriber or Customer)."
+      - name: birth_year
+        description: "Birth year of the user."
+      - name: gender
+        description: "Gender (1=Male, 2=Female, 0=Unknown)."
+      - name: filename
+        description: "Name of the source file."
+      - name: file_modified_time
+        description: "Timestamp when the file was last modified."
+      - name: load_id
+        description: "Unique ID of the load batch."
