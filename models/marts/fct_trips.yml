@@ -2,52 +2,71 @@ version: 2
 
 models:
   - name: fct_trips
-    description: "Fact table containing detailed trip information with temporal enrichments for analytical reporting."
+    description: >
+      Fact table containing detailed trip-level data for Citibike analytics.
+      Built from the staging model stg_citibike_trips, it provides enriched
+      temporal fields and user demographics for time-based and behavioral analysis.
+
     columns:
       - name: trip_id
-        description: "Surrogate key uniquely identifying each trip"
+        description: "Unique surrogate key generated for each trip."
         tests:
           - not_null
           - unique
-      - name: bikeid
-        description: "Identifier for the bike used in the trip"
+
       - name: starttime
-        description: "Timestamp when the trip started"
+        description: "Timestamp when the trip started."
         tests:
           - not_null
+
       - name: stoptime
-        description: "Timestamp when the trip ended"
-      - name: tripduration
-        description: "Duration of the trip in seconds"
-      - name: start_hour
-        description: "Hour of the day when the trip started (0–23)"
-      - name: start_day
-        description: "Day of the month when the trip started"
-      - name: start_month
-        description: "Month when the trip started"
-      - name: start_year
-        description: "Year when the trip started"
-      - name: day_of_week
-        description: "Day name when trip started"
-      - name: weekend_indicator
-        description: "Indicates if the trip started on weekend or weekday"
+        description: "Timestamp when the trip ended."
+
+      - name: duration_seconds
+        description: "Trip duration in seconds (calculated if not provided)."
+
       - name: start_station_id
-        description: "Foreign key referencing starting station in dim_stations"
+        description: "Identifier for the station where the trip began."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_stations')
+              field: station_id
+
       - name: end_station_id
-        description: "Foreign key referencing ending station in dim_stations"
+        description: "Identifier for the station where the trip ended."
+        tests:
+          - relationships:
+              to: ref('dim_stations')
+              field: station_id
+
+      - name: bikeid
+        description: "Unique identifier of the bike used for the trip."
+
       - name: usertype
-        description: "Type of user (Subscriber, Customer, etc.)"
+        description: "Type of user: Subscriber or Customer."
+
       - name: birth_year
-        description: "Birth year of the user"
-      - name: age
-        description: "Calculated age based on birth year"
+        description: "User’s year of birth (as recorded in the source data)."
+
       - name: gender
-        description: "Gender of the user"
-      - name: start_latitude
-        description: "Starting latitude coordinate"
-      - name: start_longitude
-        description: "Starting longitude coordinate"
-      - name: end_latitude
-        description: "Ending latitude coordinate"
-      - name: end_longitude
-        description: "Ending longitude coordinate"
+        description: "User’s gender code (numeric or categorical)."
+
+      - name: age
+        description: "Derived user age based on the current year and birth year."
+
+      - name: hour_of_day
+        description: "Hour (0–23) when the trip started."
+
+      - name: day_of_week
+        description: "Day of the week when the trip started (1=Sunday)."
+
+      - name: is_weekend
+        description: "Boolean flag indicating if the trip started on a weekend."
+
+      - name: load_id
+        description: "Unique identifier for the data load batch."
+
+      - name: loaded_at
+        description: "Timestamp when the record was loaded into the system."
+

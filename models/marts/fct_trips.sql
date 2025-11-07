@@ -1,116 +1,80 @@
+-- models/marts/fct_trips.sql
+-- FCT_TRIPS
+-- Trip-level fact model for analytical reporting built on stg_citibike_trips
+-- Includes trip duration, station IDs, user info, and temporal enrichments
 {{ config(
-    materialized = 'table'
+    materialized='table'
 ) }}
 
--- ==========================================================
--- Model: fct_trips
--- Description: Gold layer fact table containing deduplicated,
--- enriched trip-level data for CitiBike analytics.
--- ==========================================================
+with source as (
 
-WITH source_trips AS (
-    SELECT
-        bikeid,
-        starttime,
-        stoptime,
-        tripduration,
-        start_station_id,
-        end_station_id,
-        usertype,
-        birth_year,
-        gender,
-        start_latitude,
-        start_longitude,
-        end_latitude,
-        end_longitude,
+  select
+    tripduration,
+    starttime,
+    stoptime,
+    start_station_id,
+    end_station_id,
+    bikeid,
+    usertype,
+    birth_year,
+    gender,
+    file_row_number,
+    load_id,
+    loaded_at
+  from {{ ref('stg_citibike_trips') }}
 
-        -- Generate deterministic source-level key for deduplication
-        HASH(
-            starttime,
-            bikeid,
-            start_station_id,
-            end_station_id,
-            tripduration
-        ) AS source_trip_key
-
-    FROM {{ ref('stg_citibike_trips') }}
-    WHERE starttime IS NOT NULL
 ),
 
-deduplicated AS (
-    SELECT
-        *,
-        ROW_NUMBER() OVER (
-            PARTITION BY source_trip_key
-            ORDER BY
-                starttime ASC,
-                stoptime ASC,
-                tripduration DESC
-        ) AS rn
-    FROM source_trips
-),
+-- Derive a unique trip key and compute duration if not provided
+trip_enriched as (
+  select
+    md5(
+      concat_ws('|',
+        coalesce(cast(starttime as string), ''),
+        coalesce(cast(stoptime as string), ''),
+        coalesce(cast(bikeid as string), ''),
+        coalesce(cast(file_row_number as string), '')
+      )
+    ) as trip_id,
 
-unique_trips AS (
-    SELECT
-        -- Generate final surrogate key for each trip
-        HASH(source_trip_key, rn) AS trip_id,
-        bikeid,
-        starttime,
-        stoptime,
-        tripduration,
-        start_station_id,
-        end_station_id,
-        usertype,
-        birth_year,
-        gender,
-        start_latitude,
-        start_longitude,
-        end_latitude,
-        end_longitude
-    FROM deduplicated
-    WHERE rn = 1
-),
+    starttime,
+    stoptime,
 
-enriched_trips AS (
-    SELECT
-        trip_id,
-        bikeid,
+    -- prefer provided duration; fallback to computed duration
+    case
+      when tripduration is not null then tripduration
+      when starttime is not null and stoptime is not null then
+        timestampdiff(second, starttime, stoptime)
+      else null
+    end as duration_seconds,
 
-        -- Core trip timing
-        starttime,
-        stoptime,
-        tripduration,
+    start_station_id,
+    end_station_id,
+    bikeid,
+    usertype,
+    birth_year,
+    gender,
 
-        -- Optimized temporal enrichments using DATE_PART for performance
-        DATE_PART('hour', starttime) AS start_hour,
-        DATE_PART('day', starttime) AS start_day,
-        DATE_PART('month', starttime) AS start_month,
-        DATE_PART('year', starttime) AS start_year,
-        TO_VARCHAR(starttime, 'DY') AS day_of_week,
-        CASE
-            WHEN TO_VARCHAR(starttime, 'DY') IN ('Sat', 'Sun') THEN 'Weekend'
-            ELSE 'Weekday'
-        END AS weekend_indicator,
+    -- temporal enrichments
+    extract(hour from starttime) as hour_of_day,
+    extract(dow from starttime) + 1 as day_of_week,  -- 1=Sunday
+    case
+      when extract(dow from starttime) in (5,6) then true  -- Sat=5, Sun=6 (adjust for your warehouse)
+      else false
+    end as is_weekend,
 
-        -- Station references
-        start_station_id,
-        end_station_id,
+    -- derived user age
+    case
+      when birth_year is null or birth_year = 0 then null
+      else extract(year from current_date()) - birth_year
+    end as age,
 
-        -- User demographics
-        usertype,
-        birth_year,
-        CASE
-            WHEN birth_year IS NOT NULL THEN YEAR(CURRENT_DATE()) - birth_year
-        END AS age,
-        gender,
+    load_id,
+    loaded_at
 
-        -- Geolocation details
-        start_latitude,
-        start_longitude,
-        end_latitude,
-        end_longitude
-
-    FROM unique_trips
+  from source
 )
 
-SELECT * FROM enriched_trips
+select *
+from trip_enriched
+order by starttime

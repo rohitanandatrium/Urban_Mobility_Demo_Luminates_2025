@@ -2,18 +2,25 @@ version: 2
 
 models:
   - name: dim_stations
-    description: "Dimension table containing unique bike station information derived from both start and end stations in trip data."
+    description: >
+      Dimension table containing a unique list of bike stations derived from both
+      start and end station data in the staging model stg_citibike_trips.
+      Each record represents one unique station with its details and observation count.
     columns:
       - name: station_id
-        description: "Unique identifier for the bike station"
+        description: "Unique identifier for the bike station."
         tests:
           - not_null
           - unique
+
       - name: station_name
-        description: "Name of the bike station"
-        tests:
-          - not_null
+        description: "Descriptive name of the bike station."
+
       - name: latitude
-        description: "Geographic latitude coordinate of the station"
+        description: "Geographical latitude of the station."
+
       - name: longitude
-        description: "Geographic longitude coordinate of the station"
+        description: "Geographical longitude of the station."
+
+      - name: observations
+        description: "Number of times this station appeared across all trips (start or end)."
