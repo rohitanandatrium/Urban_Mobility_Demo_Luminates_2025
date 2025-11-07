@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: dim_stations
+    description: "Dimension table containing unique bike station information derived from both start and end stations in trip data."
+    columns:
+      - name: station_id
+        description: "Unique identifier for the bike station"
+        tests:
+          - not_null
+          - unique
+      - name: station_name
+        description: "Name of the bike station"
+        tests:
+          - not_null
+      - name: latitude
+        description: "Geographic latitude coordinate of the station"
+      - name: longitude
+        description: "Geographic longitude coordinate of the station"

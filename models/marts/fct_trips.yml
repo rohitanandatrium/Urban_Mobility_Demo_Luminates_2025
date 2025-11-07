@@ -1,23 +1,6 @@
 version: 2
 
 models:
-  - name: dim_stations
-    description: "Dimension table containing unique bike station information derived from both start and end stations in trip data."
-    columns:
-      - name: station_id
-        description: "Unique identifier for the bike station"
-        tests:
-          - not_null
-          - unique
-      - name: station_name
-        description: "Name of the bike station"
-        tests:
-          - not_null
-      - name: latitude
-        description: "Geographic latitude coordinate of the station"
-      - name: longitude
-        description: "Geographic longitude coordinate of the station"
-
   - name: fct_trips
     description: "Fact table containing detailed trip information with temporal enrichments for analytical reporting."
     columns:
@@ -37,7 +20,7 @@ models:
       - name: tripduration
         description: "Duration of the trip in seconds"
       - name: start_hour
-        description: "Hour of the day when the trip started (0-23)"
+        description: "Hour of the day when the trip started (0–23)"
       - name: start_day
         description: "Day of the month when the trip started"
       - name: start_month
@@ -45,19 +28,19 @@ models:
       - name: start_year
         description: "Year when the trip started"
       - name: day_of_week
-        description: "Name of the day of week when trip started"
+        description: "Day name when trip started"
       - name: weekend_indicator
-        description: "Indicates whether the trip started on a weekend or weekday"
+        description: "Indicates if the trip started on weekend or weekday"
       - name: start_station_id
-        description: "Foreign key referencing the starting station in dim_stations"
+        description: "Foreign key referencing starting station in dim_stations"
       - name: end_station_id
-        description: "Foreign key referencing the ending station in dim_stations"
+        description: "Foreign key referencing ending station in dim_stations"
       - name: usertype
         description: "Type of user (Subscriber, Customer, etc.)"
       - name: birth_year
         description: "Birth year of the user"
       - name: age
-        description: "Calculated age of the user based on birth year"
+        description: "Calculated age based on birth year"
       - name: gender
         description: "Gender of the user"
       - name: start_latitude
