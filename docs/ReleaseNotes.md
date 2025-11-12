@@ -33,3 +33,44 @@ Added schema and data tests for staging models.
 
 
 
+
+
+
+
+
+##  New Implementation
+
+Prepared by Atrium.ai   _Himanshu.Gautam@atrium.ai_ 
+
+# Release Notes
+
+## Release 2025.11.07 - Marts model for Citi Bike trips (DLJ25-233)
+
+**Status**  Planned Deployment 2025-11-08
+
+[**PR5**](https://github.com/rohitanandatrium/Urban_Mobility_Demo_Luminates_2025/pull/5)
+
+### 1. [DLJ25-205 – Gold Layer Model for Citi Bike Data Marts](https://atriumai.atlassian.net/browse/DLJ25-233)
+
+Implemented the **Gold layer analytical models** for Citi Bike — `DIM_STATIONS` and `FCT_TRIPS` — built on top of the staging model `stg_citibike_trips`.
+
+**Implementation Details:**
+- Added two dbt models under `models/marts/`:
+  - **`dim_stations.sql`** — provides a unique, clean list of all bike stations with their geospatial metadata.  
+  - **`fct_trips.sql`** — serves as the trip-level fact model with temporal and usage metrics for analytics.
+- Both models follow **dbt best practices**, use **CTEs** for clarity, and are **materialized as tables**.
+- Added **YAML configuration** files (`dim_stations.yml` and `fct_trips.yml`) including:
+  - `unique` and `not_null` tests for key columns.
+  - Field-level documentation for better lineage tracking.
+- All models were validated using `dbt build` and passed tests successfully.
+
+---
+
+
+
+
+
+
+
+
+
