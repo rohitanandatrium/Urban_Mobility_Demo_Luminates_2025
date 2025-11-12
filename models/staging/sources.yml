@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: DE_LUMINATE_RAW
+    schema: URBAN_MOBILITY
+    tables:
+      - name: BRONZE_CITIBIKE_TRIPS_RAW
