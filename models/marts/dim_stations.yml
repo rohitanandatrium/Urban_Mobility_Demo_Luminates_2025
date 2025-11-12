@@ -4,7 +4,7 @@ models:
   - name: dim_stations
     description: >
       Dimension table containing a unique list of bike stations derived from both
-      start and end station data in the staging model `stg_citibike_trips`.
+      start and end station data in the staging model stg_citibike_trips.
       Each record represents one unique station with its details and observation count.
     columns:
       - name: station_id

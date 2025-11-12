@@ -4,7 +4,7 @@ models:
   - name: fct_trips
     description: >
       Fact table containing detailed trip-level data for Citibike analytics.
-      Built from the staging model `stg_citibike_trips`, it provides enriched
+      Built from the staging model stg_citibike_trips, it provides enriched
       temporal fields and user demographics for time-based and behavioral analysis.
 
     columns:

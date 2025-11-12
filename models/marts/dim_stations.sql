@@ -1,4 +1,3 @@
--- models/marts/dim_stations.sql
 -- DIM_STATIONS
 -- Unique list of bike stations derived from both start and end station columns in stg_citibike_trips
 -- Produces: station_id, station_name, latitude, longitude, observations
