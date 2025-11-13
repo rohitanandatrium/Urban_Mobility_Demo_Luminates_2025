@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: v_hourly_station_activity
+    description: |
+      Hourly activity view per station providing departures, arrivals and net flow.
+      Built from fct_trips and dim_stations (Gold layer KPI view).
+    columns:
+      - name: station_id
+        description: "Station identifier (matches dim_stations.station_id)."
+        tests:
+          - not_null
+
+      - name: station_name
+        description: "Station human-readable name from dim_stations."
+
+      - name: activity_hour_ts
+        description: "Hour (timestamp truncated to hour) representing the hour bucket."
+
+      - name: departures
+        description: "Count of trips that started at this station in the hour."
+        tests:
+          - not_null
+
+      - name: arrivals
+        description: "Count of trips that ended at this station in the hour."
+        tests:
+          - not_null
+
+      - name: net_flow
+        description: "Departures - Arrivals for the hour (positive = net outflow)."

@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: v_trip_duration_analysis
+    description: |
+      Gold KPI view summarizing trip duration distribution and rider demographics.
+      Buckets trips into duration ranges (<15 min, 15–30 min, 30–60 min, >60 min)
+      with counts and average rider ages.
+    columns:
+      - name: duration_bucket
+        description: "Duration range category in minutes."
+        tests:
+          - not_null
+          - unique
+
+      - name: trip_count
+        description: "Number of trips falling into each duration bucket."
+        tests:
+          - not_null
+
+      - name: avg_rider_age
+        description: "Average rider age for trips within each duration bucket."
