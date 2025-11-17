@@ -79,7 +79,7 @@ Prepared by Atrium.ai   _Ishan@atrium.ai_
 
 [**PR6**](https://github.com/rohitanandatrium/Urban_Mobility_Demo_Luminates_2025/pull/6)
 
-## New Implementation
+
 
 ### 1. [DLJ25-274 – Final KPI Views for Citi Bike Analytics](https://atriumai.atlassian.net/browse/DLJ25-274)
 
