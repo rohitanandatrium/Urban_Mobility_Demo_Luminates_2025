@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: v_popular_routes
+    description: |
+      Gold KPI view summarizing popular routes between start and end stations.
+      Provides trip counts, average durations, and user-type breakdowns.
+    columns:
+      - name: start_station_id
+        description: "Start station identifier."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_stations')
+              field: station_id
+
+      - name: end_station_id
+        description: "End station identifier."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_stations')
+              field: station_id
+
+      - name: trip_count
+        description: "Number of trips taken along this route."
+        tests:
+          - not_null
+
+      - name: avg_duration_sec
+        description: "Average trip duration (seconds)."
+
+      - name: pct_subscriber
+        description: "Percentage of trips by Subscribers."
+
+      - name: pct_customer
+        description: "Percentage of trips by Customers or Casual riders."

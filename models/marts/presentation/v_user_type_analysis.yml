@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: v_user_type_analysis
+    description: |
+      Gold KPI view analyzing user type behavior (Subscriber vs Casual/Customer),
+      including total trips, average trip duration, and trip distribution by time of day.
+    columns:
+      - name: usertype
+        description: "Type of rider (Subscriber or Customer/Casual)."
+        tests:
+          - not_null
+
+      - name: total_trips
+        description: "Total trips taken by this user type."
+        tests:
+          - not_null
+
+      - name: avg_trip_duration_sec
+        description: "Average trip duration (seconds) for this user type."
+
+      - name: time_of_day
+        description: "Time of day category for trip start (Morning, Afternoon, Evening, Night)."
+
+      - name: trips_by_time_of_day
+        description: "Number of trips taken in this time category by each user type."

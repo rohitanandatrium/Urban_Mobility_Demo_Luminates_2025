@@ -69,4 +69,3 @@ models:
 
       - name: loaded_at
         description: "Timestamp when the record was loaded into the system."
-

@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: v_bike_utilization
+    description: |
+      Gold KPI view summarizing per-bike utilization, including total trips,
+      total hours in use, and average trips per day. Helps identify low-usage or
+      overused bikes for operational improvements.
+    columns:
+      - name: bikeid
+        description: "Unique bike identifier."
+        tests:
+          - not_null
+          - unique
+
+      - name: total_trips
+        description: "Total number of trips taken by this bike."
+        tests:
+          - not_null
+
+      - name: total_hours_in_use
+        description: "Total duration (in hours) that the bike was used."
+
+      - name: avg_trips_per_day
+        description: "Average number of trips taken per day by this bike."

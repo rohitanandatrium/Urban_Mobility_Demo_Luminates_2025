@@ -64,13 +64,34 @@ Implemented the **Gold layer analytical models** for Citi Bike — `DIM_STATIONS
   - Field-level documentation for better lineage tracking.
 - All models were validated using `dbt build` and passed tests successfully.
 
----
 
 
 
+## New Implementation
+
+Prepared by Atrium.ai   _Ishan@atrium.ai_ 
+
+# Release Notes
+
+## Release 2025.11.13 - Final KPI Views for Citi Bike Analytics (DLJ25-274)
+
+**Status**  Planned Deployment 2025-11-14
+
+[**PR6**](https://github.com/rohitanandatrium/Urban_Mobility_Demo_Luminates_2025/pull/6)
 
 
 
+### 1. [DLJ25-274 – Final KPI Views for Citi Bike Analytics](https://atriumai.atlassian.net/browse/DLJ25-274)
 
+Built a comprehensive set of KPI views in the Gold layer to support Citi Bike's operational and strategic insights.
 
-
+**Implementation Details:**
+- Created five analytical views under `models/marts/gold/`:
+  - **`V_HOURLY_STATION_ACTIVITY`** - Tracks departures, arrivals, and net flow per hour for bike redistribution
+  - **`V_POPULAR_ROUTES`** - Analyzes trip patterns, counts, and user type breakdown for route planning
+  - **`V_USER_TYPE_ANALYSIS`** - Provides insights into subscriber vs. casual rider behavior
+  - **`V_BIKE_UTILIZATION`** - Monitors fleet utilization and identifies underused/faulty bikes
+  - **`V_TRIP_DURATION_ANALYSIS`** - Analyzes trip length patterns and rider behavior by duration buckets
+- All views built on top of existing fact (`FCT_TRIPS`) and dimension (`DIM_STATIONS`) models
+- Implemented proper aggregations, calculations, and followed project naming standards
+- Added comprehensive documentation for KPI definitions and business purposes
