@@ -16,7 +16,7 @@ WITH source AS (
 parsed AS (
     SELECT
         -- Map JSON keys to structured columns
-        RAW_DATA:col1::NUMBER        AS tripduration,
+        TRY_TO_NUMBER(TO_VARCHAR(RAW_DATA:col1)) AS tripduration
         RAW_DATA:col2::TIMESTAMP_NTZ AS starttime,
         RAW_DATA:col3::TIMESTAMP_NTZ AS stoptime,
         RAW_DATA:col4::STRING        AS start_station_id,
