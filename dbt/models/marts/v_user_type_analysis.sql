@@ -1,6 +1,6 @@
 -- models/marts/gold/v_user_type_analysis.sql
 {{ config(
-    materialized='table',
+    materialized='view',
     tags=['gold','kpi','user_type_analysis']
 ) }}
 

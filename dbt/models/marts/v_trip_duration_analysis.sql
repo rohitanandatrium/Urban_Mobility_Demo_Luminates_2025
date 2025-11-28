@@ -1,6 +1,6 @@
 -- models/marts/gold/v_trip_duration_analysis.sql
 {{ config(
-    materialized='table',
+    materialized='view',
     tags=['gold','kpi','trip_duration_analysis']
 ) }}
 
