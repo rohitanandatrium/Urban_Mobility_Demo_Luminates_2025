@@ -4,7 +4,7 @@ config-version: 2
 
 profile: 'urban_mobility_demo'
 
-model-paths: ["models"]
+model-paths: ["dbt/models"]
 seed-paths: ["seeds"]
 test-paths: ["tests"]
 analysis-paths: ["analyses"]
