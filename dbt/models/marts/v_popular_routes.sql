@@ -1,5 +1,14 @@
--- models/marts/gold/v_popular_routes.sql
-{{ config(materialized='view', tags=['gold','kpi','v_popular_routes']) }}
+{{ config(
+    materialized='view',
+    unique_key='route_id',
+    tags=['gold','kpi','v_popular_routes']
+) }}
+
+{% if is_incremental() %}
+    {% set cutoff_date = "dateadd(day, -30, current_date())" %}
+{% else %}
+    {% set cutoff_date = "'2013-01-01'" %}
+{% endif %}
 
 with trips as (
   select
@@ -8,7 +17,6 @@ with trips as (
     usertype,
     starttime,
     bikeid,
-    age,
     gender,
     -- Use available columns only
     case 
@@ -27,12 +35,15 @@ with trips as (
   where start_station_id is not null
     and end_station_id is not null
     and start_station_id != end_station_id
+    -- CRITICAL: Add incremental filter for performance
+    and starttime >= {{ cutoff_date }}
 ),
 
 route_intelligence as (
   select
     start_station_id,
     end_station_id,
+    md5(start_station_id || '|' || end_station_id) as route_id,
     
     -- Core volume metrics (GROWS with data)
     count(*) as trip_count,
@@ -76,7 +87,7 @@ route_intelligence as (
     end as route_volume_tier
 
   from trips
-  group by start_station_id, end_station_id
+  group by start_station_id, end_station_id, route_id
 ),
 
 route_analytics as (
@@ -99,16 +110,22 @@ route_analytics as (
         when trip_count > 50 and pct_customer > 60 then 'Tourist Route - Seasonal Potential'
         when active_months >= 6 and trip_count < 100 then 'Stable Niche - Limited Growth'
         else 'Emerging - Monitor Growth'
-    end as growth_potential,
-    
-    -- Network ranking (DYNAMIC - updates with new routes)
-    rank() over(order by trip_count desc) as overall_rank
+    end as growth_potential
 
   from route_intelligence ri
+),
+
+station_names as (
+  -- Pre-aggregate station names for better performance
+  select station_id, station_name
+  from {{ ref('dim_stations') }}
+  where station_id is not null
+  qualify row_number() over (partition by station_id order by last_activity_date desc) = 1
 )
 
 select
   -- Core route identity
+  ra.route_id,
   ra.start_station_id,
   s1.station_name as start_station_name,
   ra.end_station_id,
@@ -116,7 +133,7 @@ select
   
   -- Volume and ranking (GROWS with data)
   ra.trip_count,
-  ra.overall_rank,
+  rank() over(order by ra.trip_count desc) as overall_rank,
   ra.route_volume_tier,
   ra.route_maturity,
   
@@ -145,8 +162,8 @@ select
   -- Strategic insights (DYNAMIC business logic)
   ra.growth_potential,
   case 
-      when ra.overall_rank <= 10 then 'Strategic Network Route'
-      when ra.overall_rank <= 50 then 'Important Corridor'
+      when ra.trip_count > 1000 then 'Strategic Network Route'
+      when ra.trip_count > 500 then 'Important Corridor'
       else 'Supporting Route'
   end as network_significance,
   
@@ -155,10 +172,11 @@ select
       when ra.last_trip_date < current_date() - 90 then 'Dormant Route - Review'
       when ra.trip_count < 10 and ra.active_months >= 3 then 'Low Volume - Investigate'
       else 'Active Route'
-  end as route_health_status
+  end as route_health_status,
+
+  current_timestamp() as processed_at
 
 from route_analytics ra
-left join {{ ref('dim_stations') }} s1 on ra.start_station_id = s1.station_id
-left join {{ ref('dim_stations') }} s2 on ra.end_station_id = s2.station_id
+left join station_names s1 on ra.start_station_id = s1.station_id
+left join station_names s2 on ra.end_station_id = s2.station_id
 where ra.trip_count >= 1
-order by ra.trip_count desc
