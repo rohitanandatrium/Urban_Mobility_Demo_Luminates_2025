@@ -24,7 +24,10 @@ parsed AS (
             WHEN FILENAME LIKE '%2015%' THEN
                 TRY_TO_TIMESTAMP(RAW_DATA:starttime::STRING, 'MM/DD/YYYY HH24:MI')
             -- 2024 CORRUPTED: stoptime = actual starttime
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
+                TRY_TO_TIMESTAMP(RAW_DATA:stoptime::STRING)
+            -- 2025 CORRECTED: stoptime = actual starttime, start_station_id = actual stoptime
+            WHEN FILENAME LIKE '2025%' THEN
                 TRY_TO_TIMESTAMP(RAW_DATA:stoptime::STRING)
             -- ALL OTHER YEARS (2013, 2014, 2024+, 2025+)
             ELSE
@@ -40,7 +43,10 @@ parsed AS (
             WHEN FILENAME LIKE '%2015%' THEN
                 TRY_TO_TIMESTAMP(RAW_DATA:stoptime::STRING, 'MM/DD/YYYY HH24:MI')
             -- 2024 CORRUPTED: start_station_id = actual stoptime
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
+                TRY_TO_TIMESTAMP(RAW_DATA:start_station_id::STRING)
+            -- 2025 CORRECTED: start_station_id = actual stoptime
+            WHEN FILENAME LIKE '2025%' THEN
                 TRY_TO_TIMESTAMP(RAW_DATA:start_station_id::STRING)
             -- ALL OTHER YEARS
             ELSE
@@ -54,7 +60,10 @@ parsed AS (
         -- 🏢 STATION DATA - UNIVERSAL MAPPING
         CASE 
             -- 2024 CORRUPTED: start_station_latitude = station ID
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
+                NULLIF(TRIM(RAW_DATA:start_station_latitude::STRING), '')
+            -- 2025 CORRECTED: start_station_latitude = start station ID
+            WHEN FILENAME LIKE '2025%' THEN
                 NULLIF(TRIM(RAW_DATA:start_station_latitude::STRING), '')
             -- ALL OTHER YEARS
             ELSE
@@ -64,15 +73,28 @@ parsed AS (
                 )
         END AS start_station_id,
 
-        COALESCE(
-            NULLIF(TRIM(RAW_DATA:start_station_name::STRING), ''),
-            NULLIF(TRIM(RAW_DATA:col5::STRING), '')
-        ) AS start_station_name,
+        CASE 
+            -- 2025 CORRECTED: start_station_longitude = start station name
+            WHEN FILENAME LIKE '2025%' THEN
+                COALESCE(
+                    NULLIF(TRIM(RAW_DATA:start_station_longitude::STRING), ''),
+                    NULLIF(TRIM(RAW_DATA:col5::STRING), '')
+                )
+            -- ALL OTHER YEARS
+            ELSE
+                COALESCE(
+                    NULLIF(TRIM(RAW_DATA:start_station_name::STRING), ''),
+                    NULLIF(TRIM(RAW_DATA:col5::STRING), '')
+                )
+        END AS start_station_name,
 
-        -- 📍 COORDINATES - CORRECTED 2024 MAPPING
+        -- 📍 COORDINATES - CORRECTED MAPPING
         CASE 
             -- 2024 CORRECTED: end_station_name = start_latitude
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
+                TRY_TO_DOUBLE(RAW_DATA:end_station_name::STRING)
+            -- 2025 CORRECTED: end_station_name = start_latitude
+            WHEN FILENAME LIKE '2025%' THEN
                 TRY_TO_DOUBLE(RAW_DATA:end_station_name::STRING)
             -- ALL OTHER YEARS
             ELSE
@@ -86,7 +108,10 @@ parsed AS (
 
         CASE 
             -- 2024 CORRECTED: bikeid = start_longitude
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
+                TRY_TO_DOUBLE(RAW_DATA:bikeid::STRING)
+            -- 2025 CORRECTED: bikeid = start_longitude
+            WHEN FILENAME LIKE '2025%' THEN
                 TRY_TO_DOUBLE(RAW_DATA:bikeid::STRING)
             -- ALL OTHER YEARS
             ELSE
@@ -99,15 +124,31 @@ parsed AS (
         END AS start_longitude,
 
         -- 🏁 END STATION - UNIVERSAL
-        COALESCE(
-            NULLIF(TRIM(RAW_DATA:end_station_id::STRING), ''),
-            NULLIF(TRIM(RAW_DATA:col8::STRING), '')
-        ) AS end_station_id,
+        CASE 
+            -- 2025 CORRECTED: end_station_longitude = end station ID
+            WHEN FILENAME LIKE '2025%' THEN
+                COALESCE(
+                    NULLIF(TRIM(RAW_DATA:end_station_longitude::STRING), ''),
+                    NULLIF(TRIM(RAW_DATA:col8::STRING), '')
+                )
+            -- ALL OTHER YEARS
+            ELSE
+                COALESCE(
+                    NULLIF(TRIM(RAW_DATA:end_station_id::STRING), ''),
+                    NULLIF(TRIM(RAW_DATA:col8::STRING), '')
+                )
+        END AS end_station_id,
 
         CASE 
             -- 2024 CORRECTED: end_station_latitude = end_station_name
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
                 NULLIF(TRIM(RAW_DATA:end_station_latitude::STRING), '')
+            -- 2025 CORRECTED: start_station_name = end station name
+            WHEN FILENAME LIKE '2025%' THEN
+                COALESCE(
+                    NULLIF(TRIM(RAW_DATA:start_station_name::STRING), ''),
+                    NULLIF(TRIM(RAW_DATA:col9::STRING), '')
+                )
             -- ALL OTHER YEARS
             ELSE
                 COALESCE(
@@ -118,8 +159,11 @@ parsed AS (
 
         CASE 
             -- 2024 CORRECTED: end_station_longitude = end_latitude
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
                 TRY_TO_DOUBLE(RAW_DATA:end_station_longitude::STRING)
+            -- 2025 CORRECTED: end_station_latitude = end latitude
+            WHEN FILENAME LIKE '2025%' THEN
+                TRY_TO_DOUBLE(RAW_DATA:end_station_latitude::STRING)
             -- ALL OTHER YEARS
             ELSE
                 COALESCE(
@@ -132,8 +176,11 @@ parsed AS (
 
         CASE 
             -- 2024: end_longitude not available in corrupted data
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
                 NULL
+            -- 2025 CORRECTED: end_station_id = end longitude
+            WHEN FILENAME LIKE '2025%' THEN
+                TRY_TO_DOUBLE(RAW_DATA:end_station_id::STRING)
             -- ALL OTHER YEARS
             ELSE
                 COALESCE(
@@ -147,7 +194,10 @@ parsed AS (
         -- 🚲 BIKE & USER DATA
         CASE 
             -- 2024 CORRUPTED: tripduration = bikeid
-            WHEN FILENAME LIKE '202402%' THEN
+            WHEN FILENAME LIKE '2024%' THEN
+                NULLIF(TRIM(RAW_DATA:tripduration::STRING), '')
+            -- 2025 CORRECTED: tripduration = bikeid
+            WHEN FILENAME LIKE '2025%' THEN
                 NULLIF(TRIM(RAW_DATA:tripduration::STRING), '')
             -- ALL OTHER YEARS
             ELSE
