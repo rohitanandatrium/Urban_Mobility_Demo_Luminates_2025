@@ -86,13 +86,13 @@ parsed AS (
                 )
         END AS start_station_name,
 
-        -- 📍 COORDINATES - CORRECTED MAPPING
+        -- 📍 COORDINATES - CORRECTED MAPPING (FIXED VERSION)
+        -- ISSUE: For 2022-2025, bikeid contains LONGITUDE, end_station_name contains LATITUDE
+        -- But they are swapped in the raw data, so we need to swap them back
         CASE 
-            -- 2022, 2023, 2024 CORRUPTED: end_station_name = start_latitude
-            WHEN FILENAME LIKE '%2022%' OR FILENAME LIKE '%2023%' OR FILENAME LIKE '%2024%' THEN
-                TRY_TO_DOUBLE(RAW_DATA:end_station_name::STRING)
-            -- 2025 CORRECTED: end_station_name = start_latitude
-            WHEN FILENAME LIKE '%2025%' THEN
+            -- 2022, 2023, 2024, 2025: bikeid = LONGITUDE, end_station_name = LATITUDE (SWAPPED)
+            WHEN FILENAME LIKE '%2022%' OR FILENAME LIKE '%2023%' OR FILENAME LIKE '%2024%' OR FILENAME LIKE '%2025%' THEN
+                -- end_station_name actually contains LATITUDE (≈40.74)
                 TRY_TO_DOUBLE(RAW_DATA:end_station_name::STRING)
             -- ALL OTHER YEARS
             ELSE
@@ -105,11 +105,9 @@ parsed AS (
         END AS start_latitude,
 
         CASE 
-            -- 2022, 2023, 2024 CORRUPTED: bikeid = start_longitude
-            WHEN FILENAME LIKE '%2022%' OR FILENAME LIKE '%2023%' OR FILENAME LIKE '%2024%' THEN
-                TRY_TO_DOUBLE(RAW_DATA:bikeid::STRING)
-            -- 2025 CORRECTED: bikeid = start_longitude
-            WHEN FILENAME LIKE '%2025%' THEN
+            -- 2022, 2023, 2024, 2025: bikeid = LONGITUDE (≈-73.97), end_station_name = LATITUDE
+            WHEN FILENAME LIKE '%2022%' OR FILENAME LIKE '%2023%' OR FILENAME LIKE '%2024%' OR FILENAME LIKE '%2025%' THEN
+                -- bikeid actually contains LONGITUDE
                 TRY_TO_DOUBLE(RAW_DATA:bikeid::STRING)
             -- ALL OTHER YEARS
             ELSE
@@ -155,11 +153,13 @@ parsed AS (
                 )
         END AS end_station_name,
 
+        -- 📍 END COORDINATES - CORRECTED MAPPING (FIXED VERSION)
         CASE 
-            -- 2022, 2023, 2024 CORRUPTED: end_station_longitude = end_latitude
+            -- 2022, 2023, 2024: end_station_longitude contains LATITUDE
             WHEN FILENAME LIKE '%2022%' OR FILENAME LIKE '%2023%' OR FILENAME LIKE '%2024%' THEN
+                -- end_station_longitude actually contains LATITUDE
                 TRY_TO_DOUBLE(RAW_DATA:end_station_longitude::STRING)
-            -- 2025 CORRECTED: end_station_latitude = end latitude
+            -- 2025: end_station_latitude contains LATITUDE
             WHEN FILENAME LIKE '%2025%' THEN
                 TRY_TO_DOUBLE(RAW_DATA:end_station_latitude::STRING)
             -- ALL OTHER YEARS
@@ -173,10 +173,11 @@ parsed AS (
         END AS end_latitude,
 
         CASE 
-            -- 2022, 2023, 2024: end_longitude not available in corrupted data
+            -- 2022, 2023, 2024: end_station_latitude contains LONGITUDE
             WHEN FILENAME LIKE '%2022%' OR FILENAME LIKE '%2023%' OR FILENAME LIKE '%2024%' THEN
-                NULL
-            -- 2025 CORRECTED: end_station_id = end longitude
+                -- end_station_latitude actually contains LONGITUDE
+                TRY_TO_DOUBLE(RAW_DATA:end_station_latitude::STRING)
+            -- 2025: end_station_id contains LONGITUDE
             WHEN FILENAME LIKE '%2025%' THEN
                 TRY_TO_DOUBLE(RAW_DATA:end_station_id::STRING)
             -- ALL OTHER YEARS
@@ -191,8 +192,9 @@ parsed AS (
 
         -- 🚲 BIKE & USER DATA
         CASE 
-            -- 2022, 2023, 2024 CORRUPTED: tripduration = bikeid
+            -- 2022, 2023, 2024 CORRUPTED: tripduration = bikeid (but bikeid is actually longitude)
             WHEN FILENAME LIKE '%2022%' OR FILENAME LIKE '%2023%' OR FILENAME LIKE '%2024%' THEN
+                -- For these years, bikeid is used for longitude, so we need real bikeid from tripduration
                 NULLIF(TRIM(RAW_DATA:tripduration::STRING), '')
             -- 2025 CORRECTED: tripduration = bikeid
             WHEN FILENAME LIKE '%2025%' THEN

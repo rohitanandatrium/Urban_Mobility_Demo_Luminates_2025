@@ -17,6 +17,9 @@ with raw_stations as (
   where start_station_id is not null 
     and start_station_id <> ''
     and start_station_name is not null
+    -- CRITICAL FIX: Filter out swapped coordinates
+    and try_to_double(start_latitude) between 40 and 41  -- NYC latitude range
+    and try_to_double(start_longitude) between -75 and -73  -- NYC longitude range
 
   union all
 
@@ -35,6 +38,9 @@ with raw_stations as (
   where end_station_id is not null 
     and end_station_id <> ''
     and end_station_name is not null
+    -- CRITICAL FIX: Filter out swapped coordinates
+    and try_to_double(end_latitude) between 40 and 41  -- NYC latitude range
+    and try_to_double(end_longitude) between -75 and -73  -- NYC longitude range
 ),
 
 station_activities as (
@@ -53,6 +59,9 @@ station_activities as (
     and latitude is not null
     and longitude is not null
     and station_name is not null
+    -- Additional safety check
+    and latitude between 40 and 41
+    and longitude between -75 and -73
   group by station_id, station_name, latitude, longitude, station_type, usertype, activity_date
 ),
 
@@ -131,6 +140,9 @@ final_stations as (
     end as operational_status
 
   from station_aggregates
+  -- Final validation check
+  where latitude between 40 and 41
+    and longitude between -75 and -73
 )
 
 select * from final_stations

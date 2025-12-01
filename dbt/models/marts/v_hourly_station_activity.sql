@@ -1,128 +1,123 @@
 -- models/marts/gold/v_hourly_station_activity.sql
-{{ config(materialized='view', tags=['gold','kpi','v_hourly_station_activity']) }}
+{{ config(
+    materialized='view',
+    tags=['gold', 'kpi', 'v_hourly_station_activity'],
+    enabled=true
+) }}
 
-with trips as (
-    select
-        start_station_id,
-        end_station_id,
-        starttime,
-        stoptime,
-        usertype
-    from {{ ref('fct_trips') }}
-    where starttime is not null
-      and stoptime is not null
+-- SIMPLIFIED VERSION - Reduced complexity for better performance
+WITH hourly_activity AS (
+    -- Departures only (arrivals not needed for basic analysis)
+    SELECT
+        start_station_id AS station_id,
+        DATE_TRUNC('hour', starttime) AS hour_ts,
+        trip_year,
+        trip_month,
+        trip_day,
+        hour_of_day,
+        1 AS trips_count,
+        CASE WHEN usertype = 'Subscriber' THEN 1 ELSE 0 END AS subscriber_flag
+        
+    FROM {{ ref('fct_trips') }}
+    WHERE start_station_id IS NOT NULL
+      AND starttime IS NOT NULL
+      AND data_quality_tier IN ('High Quality', 'Medium Quality')
 ),
 
--- YAHAN CHANGE: Station IDs ko trim karo taki dim_stations se match ho
-departures as (
-    select
-        trim(start_station_id) as station_id,  -- TRIM ADDED HERE
-        date_trunc('hour', starttime) as hour_ts,
-        extract(year from starttime) as year,
-        extract(month from starttime) as month,
-        extract(day from starttime) as day,
-        extract(hour from starttime) as hour_of_day,
-        count(*) as departures_count,
-        count(case when usertype = 'Subscriber' then 1 end) as subscriber_departures,
-        count(case when usertype = 'Customer' then 1 end) as customer_departures
-    from trips
-    where start_station_id is not null
-    group by trim(start_station_id), date_trunc('hour', starttime), 
-             extract(year from starttime), extract(month from starttime), 
-             extract(day from starttime), extract(hour from starttime)
+aggregated_hourly AS (
+    SELECT
+        station_id,
+        hour_ts,
+        trip_year AS year,
+        trip_month AS month,
+        trip_day AS day,
+        hour_of_day,
+        
+        -- Basic metrics only
+        SUM(trips_count) AS departures,
+        SUM(subscriber_flag) AS subscriber_departures,
+        COUNT(*) - SUM(subscriber_flag) AS customer_departures,
+        
+        -- Simple classification
+        CASE 
+            WHEN SUM(trips_count) > 20 THEN 'High Activity'
+            WHEN SUM(trips_count) > 10 THEN 'Medium Activity'
+            WHEN SUM(trips_count) > 5 THEN 'Low Activity'
+            ELSE 'Very Low Activity'
+        END AS activity_level
+        
+    FROM hourly_activity
+    WHERE station_id IS NOT NULL
+      AND hour_ts IS NOT NULL
+    GROUP BY station_id, hour_ts, trip_year, trip_month, trip_day, hour_of_day
+    HAVING SUM(trips_count) > 0  -- Only hours with activity
 ),
 
-arrivals as (
-    select
-        trim(end_station_id) as station_id,  -- TRIM ADDED HERE
-        date_trunc('hour', stoptime) as hour_ts,
-        extract(year from stoptime) as year,
-        extract(month from stoptime) as month,
-        extract(day from stoptime) as day,
-        extract(hour from stoptime) as hour_of_day,
-        count(*) as arrivals_count,
-        count(case when usertype = 'Subscriber' then 1 end) as subscriber_arrivals,
-        count(case when usertype = 'Customer' then 1 end) as customer_arrivals
-    from trips
-    where end_station_id is not null
-    group by trim(end_station_id), date_trunc('hour', stoptime),
-             extract(year from stoptime), extract(month from stoptime),
-             extract(day from stoptime), extract(hour from stoptime)
-),
-
-hourly_metrics as (
-    select
-        coalesce(d.station_id, a.station_id) as station_id,
-        coalesce(d.hour_ts, a.hour_ts) as hour_ts,
-        coalesce(d.year, a.year) as year,
-        coalesce(d.month, a.month) as month,
-        coalesce(d.day, a.day) as day,
-        coalesce(d.hour_of_day, a.hour_of_day) as hour_of_day,
-        coalesce(d.departures_count, 0) as departures,
-        coalesce(a.arrivals_count, 0) as arrivals,
-        coalesce(d.departures_count, 0) - coalesce(a.arrivals_count, 0) as net_flow,
-        
-        coalesce(d.subscriber_departures, 0) as subscriber_departures,
-        coalesce(d.customer_departures, 0) as customer_departures,
-        coalesce(a.subscriber_arrivals, 0) as subscriber_arrivals,
-        coalesce(a.customer_arrivals, 0) as customer_arrivals,
-        
-        coalesce(d.departures_count, 0) + coalesce(a.arrivals_count, 0) as total_activity,
-        case 
-            when (coalesce(d.departures_count, 0) + coalesce(a.arrivals_count, 0)) > 30 then 'Very High Activity'
-            when (coalesce(d.departures_count, 0) + coalesce(a.arrivals_count, 0)) > 20 then 'High Activity'
-            when (coalesce(d.departures_count, 0) + coalesce(a.arrivals_count, 0)) > 10 then 'Medium Activity'
-            else 'Low Activity'
-        end as activity_level,
-        
-        case 
-            when coalesce(d.departures_count, 0) - coalesce(a.arrivals_count, 0) > 10 then 'CRITICAL: Bike Shortage Risk'
-            when coalesce(d.departures_count, 0) - coalesce(a.arrivals_count, 0) < -10 then 'CRITICAL: Overflow Risk'
-            when abs(coalesce(d.departures_count, 0) - coalesce(a.arrivals_count, 0)) > 5 then 'WARNING: Imbalance Detected'
-            else 'Balanced Operation'
-        end as operational_status
-
-    from departures d
-    full outer join arrivals a
-        on d.station_id = a.station_id and d.hour_ts = a.hour_ts
+station_info AS (
+    SELECT
+        station_id,
+        station_name,
+        performance_tier
+    FROM {{ ref('dim_stations') }}
+    WHERE station_id IS NOT NULL
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY station_id ORDER BY last_activity_date DESC) = 1
 )
 
-select
-    hm.station_id,
-    s.station_name,
+SELECT
+    -- Station info
+    ah.station_id,
+    si.station_name,
+    si.performance_tier,
     
-    hm.hour_ts as activity_hour_ts,
-    hm.year,
-    hm.month,
-    hm.day,
-    hm.hour_of_day,
+    -- Time dimensions
+    ah.hour_ts AS activity_hour_ts,
+    ah.year,
+    ah.month,
+    ah.day,
+    ah.hour_of_day,
     
-    hm.departures,
-    hm.arrivals,
-    hm.net_flow,
-    hm.total_activity,
-    hm.activity_level,
+    -- Basic activity metrics
+    ah.departures,
+    ah.subscriber_departures,
+    ah.customer_departures,
+    ah.activity_level,
     
-    hm.subscriber_departures,
-    hm.customer_departures,
-    hm.subscriber_arrivals,
-    hm.customer_arrivals,
+    -- Simple peak classification
+    CASE
+        WHEN ah.hour_of_day BETWEEN 7 AND 9 THEN 'Morning Peak'
+        WHEN ah.hour_of_day BETWEEN 17 AND 19 THEN 'Evening Peak'
+        ELSE 'Off-Peak'
+    END AS peak_period,
     
-    hm.operational_status,
+    -- Day type
+    CASE 
+        WHEN EXTRACT(DOW FROM ah.hour_ts) IN (0,6) THEN 'Weekend'
+        ELSE 'Weekday'
+    END AS day_type,
     
-    -- YAHAN CHANGE: New column names from updated dim_stations
-    s.performance_tier,
-    s.total_trip_activities as station_total_observations,  -- COLUMN NAME UPDATED
-    
-    rank() over(partition by hm.hour_of_day order by hm.total_activity desc) as hourly_rank,
-    
-    case 
-        when hm.operational_status like 'CRITICAL%' and hm.hour_of_day between 7 and 9 then 'IMMEDIATE ACTION NEEDED'
-        when hm.operational_status like 'WARNING%' and hm.hour_of_day between 17 and 19 then 'MONITOR CLOSELY'
-        else 'STABLE OPERATION'
-    end as business_alert_level
+    -- Month name for Power BI
+    CASE ah.month
+        WHEN 1 THEN 'January'
+        WHEN 2 THEN 'February'
+        WHEN 3 THEN 'March'
+        WHEN 4 THEN 'April'
+        WHEN 5 THEN 'May'
+        WHEN 6 THEN 'June'
+        WHEN 7 THEN 'July'
+        WHEN 8 THEN 'August'
+        WHEN 9 THEN 'September'
+        WHEN 10 THEN 'October'
+        WHEN 11 THEN 'November'
+        WHEN 12 THEN 'December'
+    END AS month_name
 
-from hourly_metrics hm
-left join {{ ref('dim_stations') }} s on hm.station_id = s.station_id
-where hm.station_id is not null
-order by hm.total_activity desc, hm.hour_ts desc
+FROM aggregated_hourly ah
+LEFT JOIN station_info si ON TRIM(ah.station_id) = TRIM(si.station_id)
+
+WHERE ah.station_id IS NOT NULL
+
+ORDER BY 
+    ah.year DESC,
+    ah.month DESC,
+    ah.day DESC,
+    ah.hour_of_day DESC

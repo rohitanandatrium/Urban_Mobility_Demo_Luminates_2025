@@ -1,81 +1,111 @@
 -- models/marts/gold/v_trip_duration_analysis.sql
 {{ config(
     materialized='view',
-    tags=['gold','kpi','trip_duration_analysis']
+    tags=['gold', 'kpi', 'trip_duration_analysis'],
+    enabled=true
 ) }}
 
-with trips as (
-  select
-    trip_id,
-    duration_seconds,
-    age,
-    usertype,
-    starttime,
-    start_station_id,
-    end_station_id,
-    extract(month from starttime) as trip_month,
-    extract(year from starttime) as trip_year
-  from {{ ref('fct_trips') }}
-  where duration_seconds is not null
-    and duration_seconds between 60 and 86400
+-- COMPLETE TRIP DURATION ANALYSIS VIEW
+WITH trips AS (
+    SELECT
+        trip_id,
+        duration_seconds,
+        age,
+        usertype,
+        starttime,
+        start_station_id,
+        end_station_id,
+        
+        -- Use pre-computed columns from fct_trips
+        trip_month,
+        trip_year,
+        hour_of_day,
+        peak_period,
+        day_type,
+        season
+        
+    FROM {{ ref('fct_trips') }}
+    WHERE duration_seconds IS NOT NULL
+      AND duration_seconds BETWEEN 60 AND 86400
+      AND data_quality_tier IN ('High Quality', 'Medium Quality')
 ),
 
-bucketed as (
-  select
-    trip_id,
-    case
-      when duration_seconds < 300 then '0-5 min (Quick Ride)'
-      when duration_seconds < 600 then '5-10 min (Short Commute)'
-      when duration_seconds < 900 then '10-15 min (Standard Trip)'
-      when duration_seconds < 1200 then '15-20 min (Extended Ride)'
-      when duration_seconds < 1800 then '20-30 min (Leisure)'
-      when duration_seconds < 2700 then '30-45 min (Long Ride)'
-      when duration_seconds < 3600 then '45-60 min (Tour)'
-      when duration_seconds < 7200 then '1-2 hours (Extended Tour)'
-      else '2+ hours (Premium Rental)'
-    end as duration_bucket,
-    
-    case
-      when duration_seconds < 180 then 'Micro Ride (<3min)'
-      when duration_seconds between 180 and 600 then 'Short Ride (3-10min)'
-      when duration_seconds between 600 and 1800 then 'Standard Ride (10-30min)'
-      when duration_seconds between 1800 and 3600 then 'Long Ride (30-60min)'
-      else 'Extended Ride (>60min)'
-    end as duration_sub_bucket,
-    
-    duration_seconds,
-    age,
-    usertype,
-    extract(hour from starttime) as hour_of_day,
-    
-    case 
-      when extract(dow from starttime) in (0,6) then 'Weekend'
-      else 'Weekday'
-    end as day_type,
-    
-    case
-      when extract(hour from starttime) between 7 and 9 then 'Morning Peak'
-      when extract(hour from starttime) between 17 and 19 then 'Evening Peak'
-      when extract(hour from starttime) between 12 and 14 then 'Lunch Peak'
-      else 'Off-Peak'
-    end as peak_period,
-    
-    case 
-      when extract(month from starttime) in (12,1,2) then 'Winter'
-      when extract(month from starttime) in (3,4,5) then 'Spring' 
-      when extract(month from starttime) in (6,7,8) then 'Summer'
-      else 'Fall'
-    end as season,
-    
-    start_station_id,
-    end_station_id,
-    trip_month,
-    trip_year
-  from trips
+bucketed AS (
+    SELECT
+        trip_id,
+        
+        CASE
+            WHEN duration_seconds < 300 THEN '0-5 min (Quick Ride)'
+            WHEN duration_seconds < 600 THEN '5-10 min (Short Commute)'
+            WHEN duration_seconds < 900 THEN '10-15 min (Standard Trip)'
+            WHEN duration_seconds < 1200 THEN '15-20 min (Extended Ride)'
+            WHEN duration_seconds < 1800 THEN '20-30 min (Leisure)'
+            WHEN duration_seconds < 2700 THEN '30-45 min (Long Ride)'
+            WHEN duration_seconds < 3600 THEN '45-60 min (Tour)'
+            WHEN duration_seconds < 7200 THEN '1-2 hours (Extended Tour)'
+            ELSE '2+ hours (Premium Rental)'
+        END AS duration_bucket,
+        
+        CASE
+            WHEN duration_seconds < 180 THEN 'Micro Ride (<3min)'
+            WHEN duration_seconds BETWEEN 180 AND 600 THEN 'Short Ride (3-10min)'
+            WHEN duration_seconds BETWEEN 600 AND 1800 THEN 'Standard Ride (10-30min)'
+            WHEN duration_seconds BETWEEN 1800 AND 3600 THEN 'Long Ride (30-60min)'
+            ELSE 'Extended Ride (>60min)'
+        END AS duration_sub_bucket,
+        
+        duration_seconds,
+        age,
+        usertype,
+        hour_of_day,
+        day_type,
+        peak_period,
+        season,
+        start_station_id,
+        end_station_id,
+        trip_month,
+        trip_year,
+        
+        CASE 
+            WHEN hour_of_day BETWEEN 6 AND 10 THEN 'Morning'
+            WHEN hour_of_day BETWEEN 11 AND 15 THEN 'Afternoon'
+            WHEN hour_of_day BETWEEN 16 AND 20 THEN 'Evening'
+            ELSE 'Night'
+        END AS day_segment
+        
+    FROM trips
 ),
 
-agg as (
-  select
+agg AS (
+    SELECT
+        duration_bucket,
+        duration_sub_bucket,
+        usertype,
+        day_type,
+        peak_period,
+        season,
+        hour_of_day,
+        trip_month,
+        trip_year,
+        day_segment,
+        
+        COUNT(trip_id) AS trip_count,
+        COUNT(DISTINCT start_station_id) AS unique_start_stations,
+        COUNT(DISTINCT end_station_id) AS unique_end_stations,
+        ROUND(AVG(age), 2) AS avg_rider_age,
+        ROUND(AVG(duration_seconds) / 60, 2) AS avg_duration_minutes,
+        ROUND(MIN(duration_seconds) / 60, 2) AS min_duration_minutes,
+        ROUND(MAX(duration_seconds) / 60, 2) AS max_duration_minutes,
+        
+        ROUND(100.0 * COUNT(*) / NULLIF(SUM(COUNT(*)) OVER(), 0), 3) AS pct_of_total_trips
+        
+    FROM bucketed
+    GROUP BY 
+        duration_bucket, duration_sub_bucket, usertype, day_type, 
+        peak_period, season, hour_of_day, trip_month, trip_year, day_segment
+)
+
+SELECT
     duration_bucket,
     duration_sub_bucket,
     usertype,
@@ -85,88 +115,99 @@ agg as (
     hour_of_day,
     trip_month,
     trip_year,
+    day_segment,
     
-    count(trip_id) as trip_count,
-    count(distinct start_station_id) as unique_start_stations,
-    count(distinct end_station_id) as unique_end_stations,
-    round(avg(age),2) as avg_rider_age,
-    round(avg(duration_seconds)/60,2) as avg_duration_minutes,
-    round(min(duration_seconds)/60,2) as min_duration_minutes,
-    round(max(duration_seconds)/60,2) as max_duration_minutes,
+    trip_count,
+    unique_start_stations,
+    unique_end_stations,
+    avg_rider_age,
+    avg_duration_minutes,
+    min_duration_minutes,
+    max_duration_minutes,
+    pct_of_total_trips,
     
-    round(100.0 * count(*) / nullif(sum(count(*)) over(), 0), 3) as pct_of_total_trips,
+    RANK() OVER(PARTITION BY duration_bucket ORDER BY trip_count DESC) AS bucket_popularity_rank,
+    RANK() OVER(PARTITION BY usertype ORDER BY trip_count DESC) AS user_type_rank,
+    RANK() OVER(PARTITION BY season ORDER BY trip_count DESC) AS seasonal_rank,
+    RANK() OVER(PARTITION BY trip_year, trip_month ORDER BY trip_count DESC) AS monthly_rank,
     
-    case 
-      when hour_of_day between 6 and 10 then 'Morning'
-      when hour_of_day between 11 and 15 then 'Afternoon'
-      when hour_of_day between 16 and 20 then 'Evening'
-      else 'Night'
-    end as day_segment
-  from bucketed
-  group by 
-    duration_bucket, duration_sub_bucket, usertype, day_type, 
-    peak_period, season, hour_of_day, trip_month, trip_year
-)
+    CASE 
+        WHEN trip_count > 1000 THEN 'High Volume'
+        WHEN trip_count > 500 THEN 'Medium Volume'
+        WHEN trip_count > 100 THEN 'Low Volume'
+        ELSE 'Niche'
+    END AS volume_category,
+    
+    CASE 
+        WHEN avg_duration_minutes < 10 THEN 'Quick Trips'
+        WHEN avg_duration_minutes BETWEEN 10 AND 20 THEN 'Standard Trips'
+        WHEN avg_duration_minutes BETWEEN 20 AND 40 THEN 'Extended Trips'
+        ELSE 'Long Duration'
+    END AS duration_profile,
+    
+    CASE 
+        WHEN trip_month = EXTRACT(MONTH FROM CURRENT_DATE()) 
+         AND trip_year = EXTRACT(YEAR FROM CURRENT_DATE()) 
+        THEN 'Current Month'
+        ELSE 'Historical'
+    END AS time_recency,
+    
+    CASE trip_month
+        WHEN 1 THEN 'January'
+        WHEN 2 THEN 'February'
+        WHEN 3 THEN 'March'
+        WHEN 4 THEN 'April'
+        WHEN 5 THEN 'May'
+        WHEN 6 THEN 'June'
+        WHEN 7 THEN 'July'
+        WHEN 8 THEN 'August'
+        WHEN 9 THEN 'September'
+        WHEN 10 THEN 'October'
+        WHEN 11 THEN 'November'
+        WHEN 12 THEN 'December'
+    END AS month_name,
+    
+    CASE 
+        WHEN trip_month IN (1,2,3) THEN 'Q1'
+        WHEN trip_month IN (4,5,6) THEN 'Q2'
+        WHEN trip_month IN (7,8,9) THEN 'Q3'
+        WHEN trip_month IN (10,11,12) THEN 'Q4'
+    END AS quarter,
+    
+    CONCAT(trip_year, '-', LPAD(trip_month, 2, '0')) AS year_month,
+    
+    CASE 
+        WHEN hour_of_day BETWEEN 0 AND 5 THEN 'Late Night (0-5)'
+        WHEN hour_of_day BETWEEN 6 AND 10 THEN 'Morning (6-10)'
+        WHEN hour_of_day BETWEEN 11 AND 15 THEN 'Afternoon (11-15)'
+        WHEN hour_of_day BETWEEN 16 AND 20 THEN 'Evening (16-20)'
+        ELSE 'Night (21-23)'
+    END AS hour_segment,
+    
+    ROUND(avg_duration_minutes * 1.0 / NULLIF(unique_start_stations, 0), 2) AS avg_duration_per_station,
+    
+    CASE 
+        WHEN avg_duration_minutes < 5 AND peak_period LIKE '%Peak%' THEN 'Quick Commute'
+        WHEN avg_duration_minutes > 30 AND day_type = 'Weekend' THEN 'Leisurely Weekend Ride'
+        WHEN avg_duration_minutes BETWEEN 10 AND 20 AND usertype = 'Subscriber' THEN 'Standard Commute'
+        ELSE 'Regular Ride'
+    END AS ride_pattern
 
-select
-  duration_bucket,
-  duration_sub_bucket,
-  usertype,
-  day_type,
-  peak_period,
-  season,
-  hour_of_day,
-  trip_month,
-  trip_year,
-  day_segment,
-  
-  trip_count,
-  unique_start_stations,
-  unique_end_stations,
-  avg_rider_age,
-  avg_duration_minutes,
-  min_duration_minutes,
-  max_duration_minutes,
-  pct_of_total_trips,
-  
-  rank() over(partition by duration_bucket order by trip_count desc) as bucket_popularity_rank,
-  rank() over(partition by usertype order by trip_count desc) as user_type_rank,
-  rank() over(partition by season order by trip_count desc) as seasonal_rank,
-  
-  case 
-    when trip_count > 1000 then 'High Volume'
-    when trip_count > 500 then 'Medium Volume'
-    when trip_count > 100 then 'Low Volume'
-    else 'Niche'
-  end as volume_category,
-  
-  case 
-    when avg_duration_minutes < 10 then 'Quick Trips'
-    when avg_duration_minutes between 10 and 20 then 'Standard Trips'
-    when avg_duration_minutes between 20 and 40 then 'Extended Trips'
-    else 'Long Duration'
-  end as duration_profile,
-  
-  case 
-    when trip_month = extract(month from current_date()) 
-     and trip_year = extract(year from current_date()) 
-    then 'Current Month'
-    else 'Historical'
-  end as time_recency
-from agg
-where trip_count >= 1
-order by
-  trip_year desc,
-  trip_month desc,
-  trip_count desc,
-  case 
-    when duration_bucket like '0-5%' then 1
-    when duration_bucket like '5-10%' then 2
-    when duration_bucket like '10-15%' then 3
-    when duration_bucket like '15-20%' then 4
-    when duration_bucket like '20-30%' then 5
-    when duration_bucket like '30-45%' then 6
-    when duration_bucket like '45-60%' then 7
-    when duration_bucket like '1-2%' then 8
-    else 9
-  end
+FROM agg
+WHERE trip_count >= 1
+
+ORDER BY
+    trip_year DESC,
+    trip_month DESC,
+    trip_count DESC,
+    CASE 
+        WHEN duration_bucket LIKE '0-5%' THEN 1
+        WHEN duration_bucket LIKE '5-10%' THEN 2
+        WHEN duration_bucket LIKE '10-15%' THEN 3
+        WHEN duration_bucket LIKE '15-20%' THEN 4
+        WHEN duration_bucket LIKE '20-30%' THEN 5
+        WHEN duration_bucket LIKE '30-45%' THEN 6
+        WHEN duration_bucket LIKE '45-60%' THEN 7
+        WHEN duration_bucket LIKE '1-2%' THEN 8
+        ELSE 9
+    END
