@@ -1,182 +1,195 @@
+-- models/marts/gold/v_popular_routes.sql
 {{ config(
     materialized='view',
     unique_key='route_id',
-    tags=['gold','kpi','v_popular_routes']
+    tags=['gold', 'kpi', 'v_popular_routes'],
+    enabled=true
 ) }}
 
-{% if is_incremental() %}
-    {% set cutoff_date = "dateadd(day, -30, current_date())" %}
-{% else %}
-    {% set cutoff_date = "'2013-01-01'" %}
-{% endif %}
-
-with trips as (
-  select
-    start_station_id,
-    end_station_id,
-    usertype,
-    starttime,
-    bikeid,
-    gender,
-    -- Use available columns only
-    case 
-        when extract(hour from starttime) between 7 and 9 then 'Morning Peak'
-        when extract(hour from starttime) between 17 and 19 then 'Evening Peak'
-        when extract(hour from starttime) between 12 and 14 then 'Lunch Peak'
-        else 'Off-Peak'
-    end as peak_period,
-    case 
-        when extract(dow from starttime) in (0,6) then 'Weekend'
-        else 'Weekday'
-    end as day_type,
-    extract(month from starttime) as trip_month,
-    extract(year from starttime) as trip_year
-  from {{ ref('fct_trips') }}
-  where start_station_id is not null
-    and end_station_id is not null
-    and start_station_id != end_station_id
-    -- CRITICAL: Add incremental filter for performance
-    and starttime >= {{ cutoff_date }}
+WITH trips AS (
+    SELECT
+        start_station_id,
+        end_station_id,
+        usertype,
+        starttime,
+        bikeid,
+        gender,
+        peak_period,
+        day_type,
+        trip_month,
+        trip_year
+        
+    FROM {{ ref('fct_trips') }}
+    WHERE start_station_id IS NOT NULL
+      AND end_station_id IS NOT NULL
+      AND start_station_id != end_station_id
+      AND data_quality_tier IN ('High Quality', 'Medium Quality')
 ),
 
-route_intelligence as (
-  select
-    start_station_id,
-    end_station_id,
-    md5(start_station_id || '|' || end_station_id) as route_id,
-    
-    -- Core volume metrics (GROWS with data)
-    count(*) as trip_count,
-    
-    -- Temporal patterns (DYNAMIC)
-    count(case when peak_period = 'Morning Peak' then 1 end) as morning_peak_trips,
-    count(case when peak_period = 'Evening Peak' then 1 end) as evening_peak_trips,
-    count(case when day_type = 'Weekend' then 1 end) as weekend_trips,
-    
-    -- User demographics (GROWS)
-    count(case when lower(usertype) = 'subscriber' then 1 end) as subscriber_trips,
-    count(case when lower(usertype) in ('customer','casual') then 1 end) as customer_trips,
-    
-    -- Gender distribution (DYNAMIC)
-    count(case when gender = 1 then 1 end) as male_riders,
-    count(case when gender = 2 then 1 end) as female_riders,
-    
-    -- Bike utilization (GROWS)
-    count(distinct bikeid) as unique_bikes_used,
-    
-    -- Monthly trends (DYNAMIC - updates monthly)
-    count(distinct trip_month) as active_months,
-    count(distinct trip_year) as active_years,
-    min(starttime) as first_trip_date,
-    max(starttime) as last_trip_date,
-    
-    -- Route maturity (DYNAMIC classification)
-    case 
-        when count(distinct trip_month) >= 6 then 'Established Route'
-        when count(distinct trip_month) >= 3 then 'Growing Route'
-        else 'Emerging Route'
-    end as route_maturity,
-    
-    -- Popularity tiers (DYNAMIC - updates with data)
-    case 
-        when count(*) > 1000 then 'Super Route'
-        when count(*) > 500 then 'Major Route'
-        when count(*) > 100 then 'Medium Route'
-        when count(*) > 50 then 'Minor Route'
-        else 'Niche Route'
-    end as route_volume_tier
-
-  from trips
-  group by start_station_id, end_station_id, route_id
+route_intelligence AS (
+    SELECT
+        start_station_id,
+        end_station_id,
+        MD5(start_station_id || '|' || end_station_id) AS route_id,
+        
+        COUNT(*) AS trip_count,
+        
+        COUNT(CASE WHEN peak_period LIKE 'Morning Peak%' THEN 1 END) AS morning_peak_trips,
+        COUNT(CASE WHEN peak_period LIKE 'Evening Peak%' THEN 1 END) AS evening_peak_trips,
+        COUNT(CASE WHEN day_type = 'Weekend' THEN 1 END) AS weekend_trips,
+        
+        COUNT(CASE WHEN LOWER(usertype) = 'subscriber' THEN 1 END) AS subscriber_trips,
+        COUNT(CASE WHEN LOWER(usertype) IN ('customer','casual') THEN 1 END) AS customer_trips,
+        
+        COUNT(CASE WHEN gender = 1 THEN 1 END) AS male_riders,
+        COUNT(CASE WHEN gender = 2 THEN 1 END) AS female_riders,
+        
+        COUNT(DISTINCT bikeid) AS unique_bikes_used,
+        
+        COUNT(DISTINCT trip_month) AS active_months,
+        COUNT(DISTINCT trip_year) AS active_years,
+        MIN(starttime) AS first_trip_date,
+        MAX(starttime) AS last_trip_date,
+        
+        CASE 
+            WHEN COUNT(DISTINCT trip_month) >= 12 THEN 'Established (>1 year)'
+            WHEN COUNT(DISTINCT trip_month) >= 6 THEN 'Established (6+ months)'
+            WHEN COUNT(DISTINCT trip_month) >= 3 THEN 'Growing (3-6 months)'
+            ELSE 'Emerging (<3 months)'
+        END AS route_maturity,
+        
+        CASE 
+            WHEN COUNT(*) > 1000 THEN 'Super Route (>1000)'
+            WHEN COUNT(*) > 500 THEN 'Major Route (500-1000)'
+            WHEN COUNT(*) > 100 THEN 'Medium Route (100-500)'
+            WHEN COUNT(*) > 50 THEN 'Minor Route (50-100)'
+            WHEN COUNT(*) > 10 THEN 'Small Route (10-50)'
+            ELSE 'Niche Route (<10)'
+        END AS route_volume_tier
+        
+    FROM trips
+    GROUP BY start_station_id, end_station_id
 ),
 
-route_analytics as (
-  select
-    ri.*,
-    
-    -- Percentage calculations (DYNAMIC ratios)
-    round(100.0 * subscriber_trips / nullif(trip_count, 0), 2) as pct_subscriber,
-    round(100.0 * customer_trips / nullif(trip_count, 0), 2) as pct_customer,
-    round(100.0 * morning_peak_trips / nullif(trip_count, 0), 2) as pct_morning_peak,
-    round(100.0 * weekend_trips / nullif(trip_count, 0), 2) as pct_weekend,
-    
-    -- Gender percentages (DYNAMIC)
-    round(100.0 * male_riders / nullif(trip_count, 0), 2) as pct_male,
-    round(100.0 * female_riders / nullif(trip_count, 0), 2) as pct_female,
-    
-    -- Growth potential (DYNAMIC business logic)
-    case 
-        when trip_count > 100 and pct_subscriber > 70 then 'Commuters Route - High Potential'
-        when trip_count > 50 and pct_customer > 60 then 'Tourist Route - Seasonal Potential'
-        when active_months >= 6 and trip_count < 100 then 'Stable Niche - Limited Growth'
-        else 'Emerging - Monitor Growth'
-    end as growth_potential
-
-  from route_intelligence ri
+route_analytics AS (
+    SELECT
+        ri.*,
+        
+        ROUND(100.0 * subscriber_trips / NULLIF(trip_count, 0), 2) AS pct_subscriber,
+        ROUND(100.0 * customer_trips / NULLIF(trip_count, 0), 2) AS pct_customer,
+        ROUND(100.0 * morning_peak_trips / NULLIF(trip_count, 0), 2) AS pct_morning_peak,
+        ROUND(100.0 * evening_peak_trips / NULLIF(trip_count, 0), 2) AS pct_evening_peak,
+        ROUND(100.0 * weekend_trips / NULLIF(trip_count, 0), 2) AS pct_weekend,
+        
+        ROUND(100.0 * male_riders / NULLIF(trip_count, 0), 2) AS pct_male,
+        ROUND(100.0 * female_riders / NULLIF(trip_count, 0), 2) AS pct_female,
+        
+        CASE 
+            WHEN trip_count > 100 AND pct_subscriber > 70 THEN 'Commuters Route'
+            WHEN trip_count > 50 AND pct_customer > 60 THEN 'Tourist/Leisure Route'
+            WHEN pct_weekend > 60 THEN 'Weekend Route'
+            WHEN pct_morning_peak > 40 OR pct_evening_peak > 40 THEN 'Commute Corridor'
+            ELSE 'General Purpose Route'
+        END AS route_profile
+        
+    FROM route_intelligence ri
 ),
 
-station_names as (
-  -- Pre-aggregate station names for better performance
-  select station_id, station_name
-  from {{ ref('dim_stations') }}
-  where station_id is not null
-  qualify row_number() over (partition by station_id order by last_activity_date desc) = 1
+station_info AS (
+    SELECT 
+        station_id,
+        station_name,
+        performance_tier
+    FROM {{ ref('dim_stations') }}
+    WHERE station_id IS NOT NULL
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY station_id 
+        ORDER BY last_activity_date DESC
+    ) = 1
 )
 
-select
-  -- Core route identity
-  ra.route_id,
-  ra.start_station_id,
-  s1.station_name as start_station_name,
-  ra.end_station_id,
-  s2.station_name as end_station_name,
-  
-  -- Volume and ranking (GROWS with data)
-  ra.trip_count,
-  rank() over(order by ra.trip_count desc) as overall_rank,
-  ra.route_volume_tier,
-  ra.route_maturity,
-  
-  -- User demographics (DYNAMIC)
-  ra.subscriber_trips,
-  ra.customer_trips,
-  ra.pct_subscriber,
-  ra.pct_customer,
-  ra.pct_male,
-  ra.pct_female,
-  
-  -- Temporal patterns (DYNAMIC)
-  ra.morning_peak_trips,
-  ra.evening_peak_trips,
-  ra.weekend_trips,
-  ra.pct_morning_peak,
-  ra.pct_weekend,
-  
-  -- Operational intelligence (GROWS)
-  ra.unique_bikes_used,
-  ra.active_months,
-  ra.active_years,
-  ra.first_trip_date,
-  ra.last_trip_date,
-  
-  -- Strategic insights (DYNAMIC business logic)
-  ra.growth_potential,
-  case 
-      when ra.trip_count > 1000 then 'Strategic Network Route'
-      when ra.trip_count > 500 then 'Important Corridor'
-      else 'Supporting Route'
-  end as network_significance,
-  
-  -- Health monitoring (DYNAMIC - updates with time)
-  case 
-      when ra.last_trip_date < current_date() - 90 then 'Dormant Route - Review'
-      when ra.trip_count < 10 and ra.active_months >= 3 then 'Low Volume - Investigate'
-      else 'Active Route'
-  end as route_health_status,
+SELECT
+    ra.route_id,
+    ra.start_station_id,
+    s1.station_name AS start_station_name,
+    s1.performance_tier AS start_station_tier,
+    ra.end_station_id,
+    s2.station_name AS end_station_name,
+    s2.performance_tier AS end_station_tier,
+    
+    ra.trip_count,
+    ra.unique_bikes_used,
+    
+    RANK() OVER (ORDER BY ra.trip_count DESC) AS overall_rank,
+    RANK() OVER (PARTITION BY ra.start_station_id ORDER BY ra.trip_count DESC) AS rank_from_start_station,
+    RANK() OVER (PARTITION BY ra.end_station_id ORDER BY ra.trip_count DESC) AS rank_to_end_station,
+    
+    ra.route_volume_tier,
+    ra.route_maturity,
+    ra.route_profile,
+    
+    ra.morning_peak_trips,
+    ra.evening_peak_trips,
+    ra.weekend_trips,
+    ra.pct_morning_peak,
+    ra.pct_evening_peak,
+    ra.pct_weekend,
+    
+    ra.subscriber_trips,
+    ra.customer_trips,
+    ra.pct_subscriber,
+    ra.pct_customer,
+    ra.male_riders,
+    ra.female_riders,
+    ra.pct_male,
+    ra.pct_female,
+    
+    ra.active_years,
+    ra.active_months,
+    ra.first_trip_date,
+    ra.last_trip_date,
+    
+    CASE 
+        WHEN ra.last_trip_date < CURRENT_DATE() - 180 THEN 'Dormant (>6 months)'
+        WHEN ra.last_trip_date < CURRENT_DATE() - 90 THEN 'Declining (3-6 months)'
+        WHEN ra.trip_count < 10 AND ra.active_months >= 3 THEN 'Low Volume'
+        WHEN ra.trip_count >= 50 AND ra.last_trip_date >= CURRENT_DATE() - 7 THEN 'High Performing'
+        ELSE 'Stable'
+    END AS route_health_status,
+    
+    CASE 
+        WHEN ra.trip_count > 1000 THEN 'Strategic Network Route'
+        WHEN ra.trip_count > 500 THEN 'Important Corridor'
+        WHEN ra.trip_count > 100 THEN 'Key Connection'
+        WHEN ra.trip_count > 50 THEN 'Local Route'
+        ELSE 'Minor Connection'
+    END AS network_significance,
+    
+    CASE 
+        WHEN ra.pct_morning_peak > 60 THEN 'Increase morning bike availability'
+        WHEN ra.pct_evening_peak > 60 THEN 'Increase evening bike availability'
+        WHEN ra.unique_bikes_used < 5 AND ra.trip_count > 100 THEN 'Consider adding more bikes'
+        WHEN ra.last_trip_date < CURRENT_DATE() - 90 THEN 'Review route viability'
+        ELSE 'No action needed'
+    END AS operational_recommendation,
+    
+    ROUND(
+        (ra.trip_count * 0.0005) + 
+        (ra.active_months * 2) + 
+        (ra.unique_bikes_used * 0.5) + 
+        (CASE WHEN ra.last_trip_date >= CURRENT_DATE() - 30 THEN 20 ELSE 0 END) + 
+        (CASE WHEN ra.pct_subscriber > 70 THEN 10 ELSE 0 END),
+        0
+    ) AS route_efficiency_score,
+    
+    CURRENT_TIMESTAMP() AS analysis_timestamp
 
-  current_timestamp() as processed_at
+FROM route_analytics ra
+LEFT JOIN station_info s1 ON ra.start_station_id = s1.station_id
+LEFT JOIN station_info s2 ON ra.end_station_id = s2.station_id
 
-from route_analytics ra
-left join station_names s1 on ra.start_station_id = s1.station_id
-left join station_names s2 on ra.end_station_id = s2.station_id
-where ra.trip_count >= 1
+WHERE ra.trip_count >= 1
+
+ORDER BY 
+    ra.trip_count DESC,
+    ra.last_trip_date DESC
