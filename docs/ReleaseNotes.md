@@ -1,7 +1,7 @@
 <img src="https://atrium.ai/wp-content/uploads/2021/05/Atrium_FullColor_Horizontal.svg" alt="drawing" width="100"/>
 
 # Urban Mobility Snowflake Data Engineering Release Notes 
-Prepared by Atrium.ai   Palak.Tailor@atrium.ai  , Himanshu.Gautam@atrium.ai ,  Ishan@atrium.ai  , Vanshika.Chawla@atrium.ai , Kalpana.Bangdwa@atrium.ai
+Prepared by Atrium.ai   Palak.Tailor@atrium.ai , Himanshu.Gautam@atrium.ai , Ishan@atrium.ai , Vanshika.Chawla@atrium.ai , Kalpana.Bangdwa@atrium.ai
 
 
 # Release Notes
