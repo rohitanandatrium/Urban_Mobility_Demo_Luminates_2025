@@ -6,7 +6,7 @@ Prepared by Atrium.ai   Palak.Tailor@atrium.ai  , Himanshu.Gautam@atrium.ai ,  I
 
 # Release Notes
 
-## Release 2025.11.13 - Final KPI Views for Citi Bike Analytics (DLJ25-274)
+## Release 2025.11.3 - Final KPI Views for Citi Bike Analytics (DLJ25-274)
 
 **Status**  Planned Deployment 2025-11-14 [**PR6**](https://github.com/rohitanandatrium/Urban_Mobility_Demo_Luminates_2025/pull/6)
 
@@ -26,7 +26,7 @@ Prepared by Atrium.ai   Palak.Tailor@atrium.ai  , Himanshu.Gautam@atrium.ai ,  I
     - Implemented proper aggregations, calculations, and followed project naming standards.
     - Added comprehensive documentation for KPI definitions and business purposes.
 
-## Release 2025.11.12- Marts model for Citi Bike trips (DLJ25-233)
+## Release 2025.11.2- Marts model for Citi Bike trips (DLJ25-233)
  
 **Status**  Planned Deployment 2025-11-08 [**PR5**](https://github.com/rohitanandatrium/Urban_Mobility_Demo_Luminates_2025/pull/5)
 
