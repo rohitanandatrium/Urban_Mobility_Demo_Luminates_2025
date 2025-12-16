@@ -2,12 +2,12 @@ name: Run dbt Models in Snowflake
 
 on:
   workflow_dispatch:
-    inputs:              # <--- Must be indented exactly two spaces from 'workflow_dispatch'
-      dbt_models_to_run: # <--- Must be indented exactly two spaces from 'inputs'
-        description: '...'
-        required: true
+    inputs:              
+      dbt_models_to_run: 
+        description: 'Specify the dbt models to run (e.g., my_model another_model)'
+        required: false
         type: string
-        default: ''
+        default: ''   # Default to empty string to run all if not specified
   schedule:
     # Run at 10:30 AM IST → 05:00 UTC
     - cron: "0 5 * * *"
